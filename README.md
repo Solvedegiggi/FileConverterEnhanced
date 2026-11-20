@@ -87,24 +87,25 @@ FileConverter.exe --help
 
 ### 1. Build the Shell Extension (`Release x64`)
 ```powershell
-msbuild Application\FileConverterExtension\FileConverterExtension.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /v:minimal
+msbuild Application\FileConverterExtension\FileConverterExtension.csproj /t:Restore /p:Configuration=Release /p:Platform=x64 /v:minimal
+msbuild Application\FileConverterExtension\FileConverterExtension.csproj /t:Build /p:Configuration=Release /p:Platform=x64 /v:minimal
 ```
 
 ### 2. Build the Main Application (`Release x64`)
 ```powershell
-dotnet build Application\FileConverter\FileConverter.csproj -c Release -p:Platform=x64 --no-dependencies -m:1 -v:minimal
+dotnet build Application\FileConverter\FileConverter.csproj -c Release -p:Platform=x64 --no-dependencies -p:NuGetAudit=false -m:1 -v:minimal
 ```
 
 ### 3. Run the Automated Unit Test Suite (`FileConverter.Tests`)
 The solution includes an xUnit test project ([Application/FileConverter.Tests/FileConverter.Tests.csproj](Application/FileConverter.Tests/FileConverter.Tests.csproj)) with 20 end-to-end tests covering all PDF engines, Ghostscript compression, offline Tesseract OCR, in-place PDF text redaction, visual/text PDF comparison, bidirectional Office conversions, and settings v4→v5 migration:
 ```powershell
-dotnet build Application\FileConverter.Tests\FileConverter.Tests.csproj -c Release -p:Platform=x64 --no-dependencies -m:1 -v:minimal
+dotnet build Application\FileConverter.Tests\FileConverter.Tests.csproj -c Release -p:Platform=x64 --no-dependencies -p:NuGetAudit=false -m:1 -v:minimal
 dotnet test Application\FileConverter.Tests\FileConverter.Tests.csproj -c Release -p:Platform=x64 --no-build --verbosity normal
 ```
 
 ### 4. Build the WiX 5 MSI Installer
 ```powershell
-dotnet build Installer\Installer.wixproj -c Release -p:Platform=x64 --no-dependencies -m:1 -v:minimal
+dotnet build Installer\Installer.wixproj -c Release -p:Platform=x64 --no-dependencies -p:NuGetAudit=false -m:1 -v:minimal
 ```
 Output MSI: `Installer\bin\x64\Release\FileConverter-setup.msi`
 

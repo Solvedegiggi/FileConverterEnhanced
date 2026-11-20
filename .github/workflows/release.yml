@@ -28,18 +28,20 @@ jobs:
             9.0.x
 
       - name: Build FileConverterExtension (Release x64)
-        run: msbuild Application\FileConverterExtension\FileConverterExtension.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /v:minimal
+        run: |
+          msbuild Application\FileConverterExtension\FileConverterExtension.csproj /t:Restore /p:Configuration=Release /p:Platform=x64 /v:minimal
+          msbuild Application\FileConverterExtension\FileConverterExtension.csproj /t:Build /p:Configuration=Release /p:Platform=x64 /v:minimal
 
       - name: Build FileConverter (Release x64)
-        run: dotnet build Application\FileConverter\FileConverter.csproj -c Release -p:Platform=x64 -m:1 -v:minimal
+        run: dotnet build Application\FileConverter\FileConverter.csproj -c Release -p:Platform=x64 --no-dependencies -p:NuGetAudit=false -m:1 -v:minimal
 
       - name: Run Automated Unit Tests
         run: |
-          dotnet build Application\FileConverter.Tests\FileConverter.Tests.csproj -c Release -p:Platform=x64 --no-dependencies -m:1 -v:minimal
+          dotnet build Application\FileConverter.Tests\FileConverter.Tests.csproj -c Release -p:Platform=x64 --no-dependencies -p:NuGetAudit=false -m:1 -v:minimal
           dotnet test Application\FileConverter.Tests\FileConverter.Tests.csproj -c Release -p:Platform=x64 --no-build --verbosity normal
 
       - name: Build WiX 5 MSI Installer
-        run: dotnet build Installer\Installer.wixproj -c Release -p:Platform=x64 --no-dependencies -m:1 -v:minimal
+        run: dotnet build Installer\Installer.wixproj -c Release -p:Platform=x64 --no-dependencies -p:NuGetAudit=false -m:1 -v:minimal
 
       - name: Prepare Release Assets
         shell: pwsh
@@ -51,7 +53,14 @@ jobs:
           Copy-Item "Installer\bin\x64\Release\FileConverter-setup.msi" "dist\FileConverter-$ver-x64-setup.msi"
           Copy-Item "version.xml" "dist\version.xml"
 
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FileConverter-x64-Release
+          path: dist/*
+
       - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
