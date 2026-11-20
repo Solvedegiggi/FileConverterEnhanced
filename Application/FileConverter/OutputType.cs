@@ -9,10 +9,12 @@ namespace FileConverter
         Aac,
         Avi,
         Avif,
+        Docx,
         Flac,
         Gif,
         Ico,
         Jpg,
+        Md,
         Mkv,
         Mp3,
         Mp4,
@@ -20,8 +22,10 @@ namespace FileConverter
         Ogv,
         Pdf,
         Png,
+        Pptx,
         Wav,
         Webm,
         Webp,
+        Xlsx,
     }
 }

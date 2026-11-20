@@ -1,6 +1,6 @@
 ﻿<!-- Upgrade documentation: http://wixtoolset.org/documentation/manual/v3/howtos/updates/major_upgrade.html -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
-    <Package Name="File Converter" Language="1033" Version="2.2.0" Manufacturer="Adrien Allard" UpgradeCode="e3ca717b-a897-418a-bbef-5c7e35c76e4b" InstallerVersion="500">
+    <Package Name="File Converter" Language="1033" Version="2.3.0" Manufacturer="Solvedegiggi (fork of Adrien Allard)" UpgradeCode="e3ca717b-a897-418a-bbef-5c7e35c76e4b" InstallerVersion="500">
         <Icon Id="icon.ico" SourceFile="..\Resources\Icons\ApplicationIcon.ico" />
         <Property Id="ARPPRODUCTICON" Value="icon.ico" />
         <SetProperty Id="ARPINSTALLLOCATION" Value="[ApplicationFolder]" After="CostFinalize" />
@@ -11,6 +11,8 @@
 
         <Feature Id="Application" Title="Installer" Level="1">
             <ComponentGroupRef Id="ProductComponents" />
+            <ComponentGroupRef Id="TessdataComponents" />
+            <ComponentGroupRef Id="NativeX64Components" />
             <ComponentGroupRef Id="Languages" />
         </Feature>
 
@@ -50,7 +52,10 @@
 
     <Fragment>
         <StandardDirectory Id="ProgramFiles64Folder">
-            <Directory Id="INSTALLFOLDER" Name="!(bind.Property.ProductName)" />
+            <Directory Id="INSTALLFOLDER" Name="!(bind.Property.ProductName)">
+                <Directory Id="TessdataDir" Name="tessdata" />
+                <Directory Id="NativeX64Dir" Name="x64" />
+            </Directory>
         </StandardDirectory>
         <StandardDirectory Id="ProgramMenuFolder">
             <Directory Id="ApplicationStartMenuShortcut" Name="File Converter" />
@@ -149,6 +154,43 @@
             <Component Guid="{6268D6C0-42D8-4487-AC4B-33C9874C9E2F}">
                 <File Id="WpfAnimatedGif.dll" KeyPath="yes" Source="$(var.FileConverter.TargetDir)WpfAnimatedGif.dll" Checksum="yes" />
             </Component>
+
+            <!-- PDF, Office, OCR & WebView2 runtime libraries -->
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Docnet.Core.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)pdfium.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)DocumentFormat.OpenXml.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)DocumentFormat.OpenXml.Framework.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Microsoft.Web.WebView2.Core.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Microsoft.Web.WebView2.WinForms.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Microsoft.Web.WebView2.Wpf.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)WebView2Loader.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)PdfSharp.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)PdfSharp.Charting.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)PdfSharp.Quality.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)PdfSharp.Snippets.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)PdfSharp.System.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)PdfSharp.WPFonts.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Tesseract.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)UglyToad.PdfPig.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)UglyToad.PdfPig.Core.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)UglyToad.PdfPig.DocumentLayoutAnalysis.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)UglyToad.PdfPig.Fonts.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)UglyToad.PdfPig.Package.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)UglyToad.PdfPig.Tokenization.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)UglyToad.PdfPig.Tokens.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)NetOffice.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)OfficeApi.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)WordApi.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)ExcelApi.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)PowerPointApi.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)VBIDEApi.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Microsoft.Bcl.HashCode.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Microsoft.Extensions.Logging.Abstractions.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Microsoft.Extensions.Logging.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Microsoft.Extensions.Options.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)Microsoft.Extensions.Primitives.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)System.Diagnostics.DiagnosticSource.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Source="$(var.FileConverter.TargetDir)System.ValueTuple.dll" KeyPath="yes" Checksum="yes" /></Component>
             
             <!-- Configuration and documentation -->
             <Component Guid="{AD58807A-2AE2-48BE-AB55-9BDE9BBE37F3}">
@@ -170,6 +212,17 @@
                     <RegistryValue Name="Path" Type="string" Value="[INSTALLFOLDER]FileConverter.exe" />
                 </RegistryKey>
             </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="TessdataComponents" Directory="TessdataDir">
+            <Component Guid="*"><File Id="tessdata_eng.traineddata" Source="$(var.FileConverter.TargetDir)tessdata\eng.traineddata" KeyPath="yes" /></Component>
+            <Component Guid="*"><File Id="tessdata_ita.traineddata" Source="$(var.FileConverter.TargetDir)tessdata\ita.traineddata" KeyPath="yes" /></Component>
+        </ComponentGroup>
+        <ComponentGroup Id="NativeX64Components" Directory="NativeX64Dir">
+            <Component Guid="*"><File Id="x64_leptonica" Source="$(var.FileConverter.TargetDir)x64\leptonica-1.82.0.dll" KeyPath="yes" Checksum="yes" /></Component>
+            <Component Guid="*"><File Id="x64_tesseract50" Source="$(var.FileConverter.TargetDir)x64\tesseract50.dll" KeyPath="yes" Checksum="yes" /></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

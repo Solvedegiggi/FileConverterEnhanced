@@ -1,0 +1,72 @@
+<UserControl x:Class="FileConverter.Views.Workspaces.OfficeConversionWorkspaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:project="clr-namespace:FileConverter.Properties"
+             xmlns:workspaces="clr-namespace:FileConverter.Views.Workspaces">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <workspaces:WorkspaceHeaderControl Grid.Row="0" />
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.15*" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="1.0*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="16">
+                <workspaces:WorkspaceFileListControl />
+            </Border>
+
+            <Border Grid.Column="2" Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="18">
+                <DockPanel>
+                    <workspaces:WorkspaceOutputControl DockPanel.Dock="Bottom" />
+
+                    <StackPanel Margin="0,0,0,18">
+                        <Border CornerRadius="8" Padding="10" Margin="0,0,0,14"
+                                Background="{DynamicResource SubtlePanelBrush}">
+                            <TextBlock Text="{Binding BackendStatusSummary}" TextWrapping="Wrap" FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" />
+                        </Border>
+
+                        <!-- Excel Orientation & Fit-All-Columns options -->
+                        <StackPanel Visibility="{Binding ShowExcelOptions, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                            <TextBlock Text="{x:Static project:Resources.SettingExcelOrientation}"
+                                       FontSize="13.5" FontWeight="SemiBold" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" />
+
+                            <RadioButton Content="{x:Static project:Resources.SettingOrientationDefault}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,6"
+                                         IsChecked="{Binding IsOrientationDefault, Mode=TwoWay}" />
+                            <RadioButton Content="{x:Static project:Resources.SettingOrientationPortrait}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,6"
+                                         IsChecked="{Binding IsOrientationPortrait, Mode=TwoWay}" />
+                            <RadioButton Content="{x:Static project:Resources.SettingOrientationLandscape}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"
+                                         IsChecked="{Binding IsOrientationLandscape, Mode=TwoWay}" />
+
+                            <CheckBox Content="{x:Static project:Resources.SettingExcelFitColumns}"
+                                      Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="SemiBold"
+                                      IsChecked="{Binding ExcelFitColumnsToPage, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <!-- PDF -> Word Engine selector -->
+                        <StackPanel Visibility="{Binding ShowPdfToWordOptions, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                            <TextBlock Text="Conversion Engine" FontSize="13.5" FontWeight="SemiBold" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <CheckBox Content="Prefer Microsoft Word layout reflow (when MS Word is installed)"
+                                      Foreground="{DynamicResource TextPrimaryBrush}"
+                                      IsChecked="{Binding UseOfficeInteropForPdfToWord, Mode=TwoWay}" />
+                        </StackPanel>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

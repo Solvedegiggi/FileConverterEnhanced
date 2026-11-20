@@ -3,10 +3,11 @@
 namespace FileConverter.ConversionJobs
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using System.Windows.Input;
-    
+
     using CommunityToolkit.Mvvm.Input;
 
     using FileConverter.Diagnostics;
@@ -30,6 +31,7 @@ namespace FileConverter.ConversionJobs
             this.ConversionPreset = null;
             this.initialInputPath = string.Empty;
             this.InputFilePath = @"C:\Path\To\AVery\Long\Location\WithAVeryNiceFile.png";
+            this.InputFilePaths = new[] { this.InputFilePath };
             this.OutputFilePaths = new[] { "C:\\Path\\To\\AVery\\Long\\Location\\WithAVeryNiceFile.jpg" };
             this.StartTime = DateTime.Now - TimeSpan.FromMinutes(1.2);
             this.State = ConversionState.InProgress;
@@ -52,12 +54,50 @@ namespace FileConverter.ConversionJobs
             this.State = ConversionState.Unknown;
             this.initialInputPath = inputFilePath;
             this.InputFilePath = inputFilePath;
+            this.InputFilePaths = new[] { inputFilePath };
+            this.ConversionPreset = conversionPreset;
+            this.UserState = Properties.Resources.ConversionStatePrepareConversion;
+        }
+
+        protected ConversionJob(ConversionPreset conversionPreset, IReadOnlyList<string> inputFilePaths)
+        {
+            if (conversionPreset == null)
+            {
+                throw new ArgumentNullException(nameof(conversionPreset));
+            }
+
+            if (inputFilePaths == null || inputFilePaths.Count == 0)
+            {
+                throw new ArgumentException("At least one input file path is required.", nameof(inputFilePaths));
+            }
+
+            this.State = ConversionState.Unknown;
+            this.initialInputPath = inputFilePaths[0];
+            this.InputFilePath = inputFilePaths[0];
+            this.InputFilePaths = inputFilePaths;
+            this.ConversionPreset = conversionPreset;
+            this.UserState = Properties.Resources.ConversionStatePrepareConversion;
+        }
+
+        protected ConversionJob(ConversionPreset conversionPreset, string inputFilePath, string inputUrl)
+        {
+            if (conversionPreset == null)
+            {
+                throw new ArgumentNullException(nameof(conversionPreset));
+            }
+
+            this.State = ConversionState.Unknown;
+            this.InputUrl = inputUrl;
+            string effectivePath = !string.IsNullOrEmpty(inputFilePath) ? inputFilePath : inputUrl;
+            this.initialInputPath = effectivePath;
+            this.InputFilePath = effectivePath;
+            this.InputFilePaths = !string.IsNullOrEmpty(inputFilePath) ? new[] { inputFilePath } : Array.Empty<string>();
             this.ConversionPreset = conversionPreset;
             this.UserState = Properties.Resources.ConversionStatePrepareConversion;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        
+
         public ConversionPreset ConversionPreset
         {
             get;
@@ -68,6 +108,18 @@ namespace FileConverter.ConversionJobs
         {
             get;
             set;
+        }
+
+        public IReadOnlyList<string> InputFilePaths
+        {
+            get;
+            protected set;
+        }
+
+        public string InputUrl
+        {
+            get;
+            protected set;
         }
 
         public string OutputFilePath
@@ -101,7 +153,14 @@ namespace FileConverter.ConversionJobs
             {
                 this.state = value;
                 this.NotifyPropertyChanged();
-                Application.Current.Dispatcher.Invoke(() => this.cancelCommand?.NotifyCanExecuteChanged());
+                if (Application.Current?.Dispatcher != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() => this.cancelCommand?.NotifyCanExecuteChanged());
+                }
+                else
+                {
+                    this.cancelCommand?.NotifyCanExecuteChanged();
+                }
             }
         }
 
@@ -185,6 +244,13 @@ namespace FileConverter.ConversionJobs
             }
         }
 
+        protected virtual bool ValidateInputExtension => true;
+
+        protected virtual bool IsFileBasedInput =>
+            string.IsNullOrEmpty(this.InputUrl) &&
+            !string.IsNullOrEmpty(this.InputFilePath) &&
+            System.IO.File.Exists(this.InputFilePath);
+
         protected virtual InputPostConversionAction InputPostConversionAction
         {
             get
@@ -220,13 +286,19 @@ namespace FileConverter.ConversionJobs
 
             this.InputFilePath = this.initialInputPath;
 
-            string extension = System.IO.Path.GetExtension(this.initialInputPath);
-            extension = extension.Substring(1, extension.Length - 1);
-            string extensionCategory = Helpers.GetExtensionCategory(extension);
-            if (!Helpers.IsOutputTypeCompatibleWithCategory(this.ConversionPreset.OutputType, extensionCategory))
+            if (this.ValidateInputExtension)
             {
-                this.ConversionFailed(Properties.Resources.ErrorInputTypeIncompatibleWithOutputType);
-                return;
+                string extension = System.IO.Path.GetExtension(this.initialInputPath);
+                if (!string.IsNullOrEmpty(extension))
+                {
+                    extension = extension.Substring(1, extension.Length - 1);
+                }
+
+                if (!Helpers.IsOutputTypeCompatibleWithExtension(this.ConversionPreset.OutputType, extension))
+                {
+                    this.ConversionFailed(Properties.Resources.ErrorInputTypeIncompatibleWithOutputType);
+                    return;
+                }
             }
 
             this.OutputFilePaths = outputFilePaths;
@@ -253,7 +325,7 @@ namespace FileConverter.ConversionJobs
                     return;
                 }
 
-                if (path == this.InputFilePath)
+                if (path == this.InputFilePath && this.IsFileBasedInput)
                 {
                     // If the input post conversion action is to move or delete the input file, change its name in order to keep the output name intact.
                     if (this.ConversionPreset.InputPostConversionAction == InputPostConversionAction.MoveInArchiveFolder ||
@@ -291,7 +363,7 @@ namespace FileConverter.ConversionJobs
             this.CurrentOutputFilePathIndex = 0;
 
             // Check if the input file is located on a cd drive.
-            if (PathHelpers.IsOnCDDrive(this.InputFilePath))
+            if (this.IsFileBasedInput && PathHelpers.IsOnCDDrive(this.InputFilePath))
             {
                 this.StateFlags = ConversionFlags.CdDriveExtraction;
             }
@@ -336,7 +408,7 @@ namespace FileConverter.ConversionJobs
 
             this.StartTime = DateTime.Now;
             this.State = ConversionState.InProgress;
-            
+
             try
             {
                 this.Convert();
@@ -417,32 +489,35 @@ namespace FileConverter.ConversionJobs
         {
             Debug.Log("Conversion Succeed!");
 
-            this.ChangeOutputFileTimestampToMatchOriginal();
-
-            // Apply the input post conversion action.
-            switch (this.InputPostConversionAction)
+            if (this.IsFileBasedInput)
             {
-                case InputPostConversionAction.None:
-                    break;
+                this.ChangeOutputFileTimestampToMatchOriginal();
 
-                case InputPostConversionAction.MoveInArchiveFolder:
-                    string basePath = System.IO.Path.GetDirectoryName(this.initialInputPath);
-                    string inputFilename = System.IO.Path.GetFileName(this.initialInputPath);
-                    string archivePath = basePath + "\\" + this.ConversionPreset.ConversionArchiveFolderName;
-                    if (!System.IO.Directory.Exists(archivePath))
-                    {
-                        System.IO.Directory.CreateDirectory(archivePath);
-                    }
+                // Apply the input post conversion action.
+                switch (this.InputPostConversionAction)
+                {
+                    case InputPostConversionAction.None:
+                        break;
 
-                    string newPath = PathHelpers.GenerateUniquePath(archivePath + "\\" + inputFilename);
-                    System.IO.File.Move(this.InputFilePath, newPath);
-                    Debug.Log($"Input file moved in archive folder: '{newPath}'");
-                    break;
+                    case InputPostConversionAction.MoveInArchiveFolder:
+                        string basePath = System.IO.Path.GetDirectoryName(this.initialInputPath);
+                        string inputFilename = System.IO.Path.GetFileName(this.initialInputPath);
+                        string archivePath = basePath + "\\" + this.ConversionPreset.ConversionArchiveFolderName;
+                        if (!System.IO.Directory.Exists(archivePath))
+                        {
+                            System.IO.Directory.CreateDirectory(archivePath);
+                        }
 
-                case InputPostConversionAction.Delete:
-                    System.IO.File.Delete(this.InputFilePath);
-                    Debug.Log($"Input file deleted: '{this.initialInputPath}'");
-                    break;
+                        string newPath = PathHelpers.GenerateUniquePath(archivePath + "\\" + inputFilename);
+                        System.IO.File.Move(this.InputFilePath, newPath);
+                        Debug.Log($"Input file moved in archive folder: '{newPath}'");
+                        break;
+
+                    case InputPostConversionAction.Delete:
+                        System.IO.File.Delete(this.InputFilePath);
+                        Debug.Log($"Input file deleted: '{this.initialInputPath}'");
+                        break;
+                }
             }
 
             Debug.Log(string.Empty);

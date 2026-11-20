@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <IsPackable>false</IsPackable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <OutputPath>bin\x64\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileConverter\FileConverter.csproj" />
+  </ItemGroup>
+
+  <Target Name="CopyNativeRuntimeAssets" AfterTargets="Build">
+    <ItemGroup>
+      <TessdataFiles Include="$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\tessdata\*.*" />
+      <X64Files Include="$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\x64\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\gswin64c.exe" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\gswin64c.exe')" />
+    <Copy SourceFiles="$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\gsdll64.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\gsdll64.dll')" />
+    <Copy SourceFiles="$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\pdfium.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\pdfium.dll')" />
+    <Copy SourceFiles="$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\Magick.Native-Q16-x64.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)..\FileConverter\bin\x64\$(Configuration)\Magick.Native-Q16-x64.dll')" />
+    <Copy SourceFiles="@(TessdataFiles)" DestinationFolder="$(TargetDir)tessdata\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(X64Files)" DestinationFolder="$(TargetDir)x64\" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

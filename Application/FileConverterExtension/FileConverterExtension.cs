@@ -75,6 +75,11 @@ namespace FileConverterExtension
         {
             this.RefreshExtensionCacheFromSelectedItems();
 
+            if (this.HasEnhancedToolSupport())
+            {
+                return true;
+            }
+
             PresetReference[] presets = this.PresetReferences;
             foreach (string extension in this.extensionCache)
             {
@@ -169,6 +174,8 @@ namespace FileConverterExtension
             {
                 fileConverterItem.DropDownItems.Add(new ToolStripSeparator());
             }
+
+            this.AddPdfAndDocumentToolsSubmenu(fileConverterItem);
 
             {
                 ToolStripMenuItem subItem = new ToolStripMenuItem
@@ -385,6 +392,142 @@ namespace FileConverterExtension
                     }
                 }
             };
+        }
+
+        private bool HasEnhancedToolSupport()
+        {
+            foreach (string ext in this.extensionCache)
+            {
+                if (ext == "pdf" || ext == "html" || ext == "htm" ||
+                    ext == "doc" || ext == "docx" || ext == "odt" ||
+                    ext == "ppt" || ext == "pptx" || ext == "odp" ||
+                    ext == "xls" || ext == "xlsx" || ext == "ods" ||
+                    ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "bmp" ||
+                    ext == "webp" || ext == "tif" || ext == "tiff" || ext == "gif" || ext == "avif")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void AddPdfAndDocumentToolsSubmenu(ToolStripMenuItem parentItem)
+        {
+            ToolStripMenuItem toolsMenu = new ToolStripMenuItem
+            {
+                Text = "PDF & Document Tools",
+                Image = new Icon(Properties.Resources.ApplicationIcon, SystemInformation.SmallIconSize).ToBitmap(),
+            };
+
+            bool hasPdf = this.extensionCache.Contains("pdf");
+            bool hasImages = this.extensionCache.Any(e =>
+                e == "jpg" || e == "jpeg" || e == "png" || e == "bmp" ||
+                e == "webp" || e == "tif" || e == "tiff" || e == "gif" || e == "avif");
+            bool hasWord = this.extensionCache.Any(e => e == "doc" || e == "docx" || e == "odt");
+            bool hasPpt = this.extensionCache.Any(e => e == "ppt" || e == "pptx" || e == "odp");
+            bool hasExcel = this.extensionCache.Any(e => e == "xls" || e == "xlsx" || e == "ods");
+            bool hasHtml = this.extensionCache.Any(e => e == "html" || e == "htm");
+
+            int selectedCount = this.SelectedItemPaths.Count();
+
+            if (hasPdf)
+            {
+                if (selectedCount >= 2)
+                {
+                    AddToolActionItem(toolsMenu, "Merge PDF", "MergePdf");
+                }
+
+                if (selectedCount == 2)
+                {
+                    AddToolActionItem(toolsMenu, "Compare PDF", "ComparePdf");
+                }
+
+                AddToolActionItem(toolsMenu, "Split PDF", "SplitPdf");
+                AddToolActionItem(toolsMenu, "Compress PDF", "CompressPdf");
+                AddToolActionItem(toolsMenu, "Organize PDF", "OrganizePdf");
+                AddToolActionItem(toolsMenu, "Rotate PDF", "RotatePdf");
+                AddToolActionItem(toolsMenu, "Crop PDF", "CropPdf");
+                AddToolActionItem(toolsMenu, "Edit PDF", "EditPdf");
+                AddToolActionItem(toolsMenu, "Page Numbers", "PageNumbersPdf");
+                AddToolActionItem(toolsMenu, "OCR PDF", "OcrPdf");
+                toolsMenu.DropDownItems.Add(new ToolStripSeparator());
+                AddToolActionItem(toolsMenu, "PDF to Word", "PdfToWord");
+                AddToolActionItem(toolsMenu, "PDF to PowerPoint", "PdfToPowerPoint");
+                AddToolActionItem(toolsMenu, "PDF to Excel", "PdfToExcel");
+                AddToolActionItem(toolsMenu, "PDF to JPG", "PdfToJpg");
+                AddToolActionItem(toolsMenu, "PDF to Markdown", "PdfToMarkdown");
+                toolsMenu.DropDownItems.Add(new ToolStripSeparator());
+            }
+
+            if (hasImages)
+            {
+                AddToolActionItem(toolsMenu, "Images to PDF", "JpgToPdf");
+            }
+
+            if (hasWord)
+            {
+                AddToolActionItem(toolsMenu, "Word to PDF", "WordToPdf");
+            }
+
+            if (hasPpt)
+            {
+                AddToolActionItem(toolsMenu, "PowerPoint to PDF", "PowerPointToPdf");
+            }
+
+            if (hasExcel)
+            {
+                AddToolActionItem(toolsMenu, "Excel to PDF", "ExcelToPdf");
+            }
+
+            if (hasHtml)
+            {
+                AddToolActionItem(toolsMenu, "HTML to PDF", "HtmlToPdf");
+            }
+
+            AddToolActionItem(toolsMenu, "Open in File Converter Hub...", "UniversalConverter");
+            parentItem.DropDownItems.Add(toolsMenu);
+        }
+
+        private void AddToolActionItem(ToolStripMenuItem parent, string text, string toolId)
+        {
+            ToolStripMenuItem item = new ToolStripMenuItem
+            {
+                Text = text,
+            };
+            item.Click += (sender, args) => this.LaunchTool(toolId);
+            parent.DropDownItems.Add(item);
+        }
+
+        private void LaunchTool(string toolId)
+        {
+            if (string.IsNullOrEmpty(PathHelpers.FileConverterPath) || !File.Exists(PathHelpers.FileConverterPath))
+            {
+                MessageBox.Show("Can't retrieve the file converter executable path. You should try to reinstall the application.");
+                return;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("--tool \"").Append(toolId).Append('"');
+
+            foreach (string filePath in this.SelectedItemPaths)
+            {
+                if (sb.Length + filePath.Length + 4 >= MaximumProcessArgumentsLength)
+                {
+                    break;
+                }
+
+                sb.Append(" \"").Append(filePath).Append('"');
+            }
+
+            var processStartInfo = new ProcessStartInfo(PathHelpers.FileConverterPath)
+            {
+                CreateNoWindow = false,
+                UseShellExecute = false,
+                Arguments = sb.ToString(),
+            };
+
+            Process.Start(processStartInfo);
         }
     }
 }

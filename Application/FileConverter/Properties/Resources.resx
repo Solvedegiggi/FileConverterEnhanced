@@ -616,4 +616,265 @@ use maj for uppercase version</value>
   <data name="HardwareAccelerationModeVulkanName" xml:space="preserve">
     <value>Vulkan</value>
   </data>
+  <data name="StringWebName" xml:space="preserve">
+    <value>Web</value>
+  </data>
+  <data name="HubNavHome" xml:space="preserve">
+    <value>Quick Home</value>
+  </data>
+  <data name="HubNavConverter" xml:space="preserve">
+    <value>Universal Converter</value>
+  </data>
+  <data name="HubNavAllTools" xml:space="preserve">
+    <value>All Tools</value>
+  </data>
+  <data name="HubNavQueue" xml:space="preserve">
+    <value>Conversion Queue</value>
+  </data>
+  <data name="HubNavSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="HubNavDiagnostics" xml:space="preserve">
+    <value>Logs</value>
+  </data>
+  <data name="HubSearchPlaceholder" xml:space="preserve">
+    <value>Search PDF tools or presets...</value>
+  </data>
+  <data name="HubToggleThemeTooltip" xml:space="preserve">
+    <value>Switch Light / Dark theme</value>
+  </data>
+  <data name="HubConfigureGrid" xml:space="preserve">
+    <value>Customize Grid</value>
+  </data>
+  <data name="HubFinishConfigureGrid" xml:space="preserve">
+    <value>Done Editing</value>
+  </data>
+  <data name="HubAddToGrid" xml:space="preserve">
+    <value>Add Tool or Preset</value>
+  </data>
+  <data name="HubHomeSubtitle" xml:space="preserve">
+    <value>Your configurable quick-access grid. Drop files directly onto any card or click to open.</value>
+  </data>
+  <data name="HubNewBadge" xml:space="preserve">
+    <value>New!</value>
+  </data>
+  <data name="UniversalDropHint" xml:space="preserve">
+    <value>Drag &amp; drop files here, or click Browse Files</value>
+  </data>
+  <data name="UniversalBrowseFiles" xml:space="preserve">
+    <value>Browse Files...</value>
+  </data>
+  <data name="UniversalInputFiles" xml:space="preserve">
+    <value>Input files</value>
+  </data>
+  <data name="UniversalOutputFormat" xml:space="preserve">
+    <value>Output format / Operation</value>
+  </data>
+  <data name="UniversalOutputDestination" xml:space="preserve">
+    <value>Output destination</value>
+  </data>
+  <data name="UniversalSameFolder" xml:space="preserve">
+    <value>Same folder as source</value>
+  </data>
+  <data name="UniversalCustomFolder" xml:space="preserve">
+    <value>Custom folder</value>
+  </data>
+  <data name="UniversalStartConversion" xml:space="preserve">
+    <value>Convert Now</value>
+  </data>
+  <data name="UniversalClearList" xml:space="preserve">
+    <value>Clear List</value>
+  </data>
+  <data name="UniversalUrlLabel" xml:space="preserve">
+    <value>Or enter a Web URL to convert to PDF:</value>
+  </data>
+  <data name="UniversalNoCompatibleFormats" xml:space="preserve">
+    <value>No common compatible output format for this file selection.</value>
+  </data>
+  <data name="CommonBackToHome" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="CommonOutputFile" xml:space="preserve">
+    <value>Save output as...</value>
+  </data>
+  <data name="CommonOutputFolder" xml:space="preserve">
+    <value>Output folder</value>
+  </data>
+  <data name="CommonStartProcess" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="CommonBrowse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
+  <data name="CommonMoveUp" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="CommonMoveDown" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="CommonRemove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="CommonPages" xml:space="preserve">
+    <value>Pages</value>
+  </data>
+  <data name="CommonCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ToolCategoryOrganize" xml:space="preserve">
+    <value>Organize PDF</value>
+  </data>
+  <data name="ToolCategoryOptimize" xml:space="preserve">
+    <value>Optimize PDF</value>
+  </data>
+  <data name="ToolCategoryConvertToPdf" xml:space="preserve">
+    <value>Convert to PDF</value>
+  </data>
+  <data name="ToolCategoryConvertFromPdf" xml:space="preserve">
+    <value>Convert from PDF</value>
+  </data>
+  <data name="ToolCategoryEditCompare" xml:space="preserve">
+    <value>Edit &amp; Compare</value>
+  </data>
+  <data name="ToolCategoryPresets" xml:space="preserve">
+    <value>Saved Conversion Presets</value>
+  </data>
+  <data name="ToolMergePdfTitle" xml:space="preserve">
+    <value>Merge PDF</value>
+  </data>
+  <data name="ToolMergePdfDesc" xml:space="preserve">
+    <value>Combine PDFs in the order you want with the easiest PDF merger available.</value>
+  </data>
+  <data name="ToolSplitPdfTitle" xml:space="preserve">
+    <value>Split PDF</value>
+  </data>
+  <data name="ToolSplitPdfDesc" xml:space="preserve">
+    <value>Extract one or multiple pages or separate each page into its own PDF file.</value>
+  </data>
+  <data name="ToolCompressPdfTitle" xml:space="preserve">
+    <value>Compress PDF</value>
+  </data>
+  <data name="ToolCompressPdfDesc" xml:space="preserve">
+    <value>Reduce file size while optimizing for maximal PDF quality.</value>
+  </data>
+  <data name="ToolPdfToWordTitle" xml:space="preserve">
+    <value>PDF to Word</value>
+  </data>
+  <data name="ToolPdfToWordDesc" xml:space="preserve">
+    <value>Easily convert your PDF files into easy to edit DOCX Word documents.</value>
+  </data>
+  <data name="ToolPdfToPowerPointTitle" xml:space="preserve">
+    <value>PDF to PowerPoint</value>
+  </data>
+  <data name="ToolPdfToPowerPointDesc" xml:space="preserve">
+    <value>Turn your PDF files into easy to edit PPTX PowerPoint presentations.</value>
+  </data>
+  <data name="ToolPdfToExcelTitle" xml:space="preserve">
+    <value>PDF to Excel</value>
+  </data>
+  <data name="ToolPdfToExcelDesc" xml:space="preserve">
+    <value>Pull data straight from PDFs into Excel spreadsheets in seconds.</value>
+  </data>
+  <data name="ToolWordToPdfTitle" xml:space="preserve">
+    <value>Word to PDF</value>
+  </data>
+  <data name="ToolWordToPdfDesc" xml:space="preserve">
+    <value>Convert your DOC and DOCX documents to high-quality PDF files.</value>
+  </data>
+  <data name="ToolPowerPointToPdfTitle" xml:space="preserve">
+    <value>PowerPoint to PDF</value>
+  </data>
+  <data name="ToolPowerPointToPdfDesc" xml:space="preserve">
+    <value>Convert PPT and PPTX slideshows into clean, accurate PDF documents.</value>
+  </data>
+  <data name="ToolExcelToPdfTitle" xml:space="preserve">
+    <value>Excel to PDF</value>
+  </data>
+  <data name="ToolExcelToPdfDesc" xml:space="preserve">
+    <value>Convert Excel spreadsheets to PDF with orientation and fit-columns options.</value>
+  </data>
+  <data name="ToolEditPdfTitle" xml:space="preserve">
+    <value>Edit PDF</value>
+  </data>
+  <data name="ToolEditPdfDesc" xml:space="preserve">
+    <value>Add text, images, shapes, freehand annotations, or edit/redact existing PDF text.</value>
+  </data>
+  <data name="ToolPdfToJpgTitle" xml:space="preserve">
+    <value>PDF to JPG</value>
+  </data>
+  <data name="ToolPdfToJpgDesc" xml:space="preserve">
+    <value>Convert each PDF page into a JPG image or extract all embedded images.</value>
+  </data>
+  <data name="ToolJpgToPdfTitle" xml:space="preserve">
+    <value>JPG to PDF</value>
+  </data>
+  <data name="ToolJpgToPdfDesc" xml:space="preserve">
+    <value>Convert JPG images to PDF in seconds. Adjust orientation and margins.</value>
+  </data>
+  <data name="ToolRotatePdfTitle" xml:space="preserve">
+    <value>Rotate PDF</value>
+  </data>
+  <data name="ToolRotatePdfDesc" xml:space="preserve">
+    <value>Rotate your PDFs the way you need them. Rotate multiple files at once.</value>
+  </data>
+  <data name="ToolHtmlToPdfTitle" xml:space="preserve">
+    <value>HTML to PDF</value>
+  </data>
+  <data name="ToolHtmlToPdfDesc" xml:space="preserve">
+    <value>Convert webpages or local HTML files to PDF by pasting a URL or picking a file.</value>
+  </data>
+  <data name="ToolOrganizePdfTitle" xml:space="preserve">
+    <value>Organize PDF</value>
+  </data>
+  <data name="ToolOrganizePdfDesc" xml:space="preserve">
+    <value>Sort pages of your PDF file however you like, delete pages or add new ones.</value>
+  </data>
+  <data name="ToolPageNumbersPdfTitle" xml:space="preserve">
+    <value>Page numbers</value>
+  </data>
+  <data name="ToolPageNumbersPdfDesc" xml:space="preserve">
+    <value>Add page numbers into PDFs with ease. Choose position, dimensions, format and typography.</value>
+  </data>
+  <data name="ToolOcrPdfTitle" xml:space="preserve">
+    <value>OCR PDF</value>
+  </data>
+  <data name="ToolOcrPdfDesc" xml:space="preserve">
+    <value>Easily convert scanned PDFs into searchable and selectable PDF documents.</value>
+  </data>
+  <data name="ToolComparePdfTitle" xml:space="preserve">
+    <value>Compare PDF</value>
+  </data>
+  <data name="ToolComparePdfDesc" xml:space="preserve">
+    <value>Show a side-by-side document comparison and easily spot visual or text changes.</value>
+  </data>
+  <data name="ToolCropPdfTitle" xml:space="preserve">
+    <value>Crop PDF</value>
+  </data>
+  <data name="ToolCropPdfDesc" xml:space="preserve">
+    <value>Crop margins of PDF documents or select specific areas across pages.</value>
+  </data>
+  <data name="ToolPdfToMarkdownTitle" xml:space="preserve">
+    <value>PDF to Markdown</value>
+  </data>
+  <data name="ToolPdfToMarkdownDesc" xml:space="preserve">
+    <value>Convert PDFs to clean Markdown for notes and LLMs. Headings, tables, lists and links preserved.</value>
+  </data>
+  <data name="SettingExcelOrientation" xml:space="preserve">
+    <value>Excel page orientation :</value>
+  </data>
+  <data name="SettingExcelFitColumns" xml:space="preserve">
+    <value>Fit all columns on one page width</value>
+  </data>
+  <data name="SettingOrientationDefault" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="SettingOrientationPortrait" xml:space="preserve">
+    <value>Portrait</value>
+  </data>
+  <data name="SettingOrientationLandscape" xml:space="preserve">
+    <value>Landscape</value>
+  </data>
+  <data name="SettingOrientationAuto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
 </root>

@@ -146,9 +146,20 @@ namespace FileConverter
                 return "Invalid input file path (argument 0).";
             }
 
-            string inputExtension = System.IO.Path.GetExtension(inputFilePath).Substring(1);
-            string inputPathWithoutExtension = inputFilePath.Substring(0, inputFilePath.Length - inputExtension.Length - 1);
-            string outputExtension = outputFileExtension.ToString().ToLowerInvariant();
+            string inputExtension = System.IO.Path.GetExtension(inputFilePath);
+            if (!string.IsNullOrEmpty(inputExtension))
+            {
+                inputExtension = inputExtension.Substring(1);
+            }
+            else
+            {
+                inputExtension = string.Empty;
+            }
+
+            string inputPathWithoutExtension = string.IsNullOrEmpty(inputExtension)
+                ? inputFilePath
+                : inputFilePath.Substring(0, inputFilePath.Length - inputExtension.Length - 1);
+            string outputExtension = Helpers.GetOutputExtension(outputFileExtension);
 
             if (string.IsNullOrEmpty(outputFilePathTemplate))
             {

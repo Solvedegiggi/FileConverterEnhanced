@@ -1,0 +1,29 @@
+<UserControl x:Class="FileConverter.Views.Workspaces.WorkspaceHeaderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:project="clr-namespace:FileConverter.Properties"
+             xmlns:generic="clr-namespace:FileConverter.ValueConverters.Generic">
+    <UserControl.Resources>
+        <generic:HexToBrushConverter x:Key="HexToBrush" />
+    </UserControl.Resources>
+    <DockPanel Margin="0,0,0,16">
+        <Button Content="{x:Static project:Resources.CommonBackToHome}"
+                DockPanel.Dock="Right" VerticalAlignment="Center"
+                Style="{StaticResource HubSecondaryButton}"
+                Command="{Binding BackCommand}" />
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,14,0"
+                    Background="{Binding Tool.AccentColorHex, Converter={StaticResource HexToBrush}}">
+                <TextBlock Text="{Binding Tool.BadgeGlyph}" Foreground="White"
+                           FontWeight="Bold" FontSize="15"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{Binding Tool.Title}" FontSize="20" FontWeight="Bold"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+                <TextBlock Text="{Binding Tool.Description}" FontSize="12.5"
+                           Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

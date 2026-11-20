@@ -2,6 +2,7 @@
 
 namespace FileConverter.Services
 {
+    using System;
     using System.Collections.ObjectModel;
 
     using FileConverter.ConversionJobs;
@@ -9,6 +10,8 @@ namespace FileConverter.Services
     public interface IConversionService
     {
         event System.EventHandler<ConversionJobsTerminatedEventArgs> ConversionJobsTerminated;
+
+        event System.EventHandler ConversionJobsChanged;
 
         ReadOnlyCollection<ConversionJob> ConversionJobs
         {
@@ -18,5 +21,7 @@ namespace FileConverter.Services
         void ConvertFilesAsync();
 
         void RegisterConversionJob(ConversionJob conversionJob);
+
+        void ClearCompletedJobs();
     }
 }

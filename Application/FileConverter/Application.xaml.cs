@@ -38,7 +38,7 @@ namespace FileConverter
         private static readonly Version Version = new Version()
                                                       {
                                                           Major = 2,
-                                                          Minor = 2,
+                                                          Minor = 3,
                                                           Patch = 0,
                                                       };
 
@@ -48,6 +48,9 @@ namespace FileConverter
         private bool verbose;
         private bool showSettings;
         private bool showHelp;
+        private bool showHub;
+        private string launchToolId;
+        private System.Collections.Generic.List<string> launchToolFiles;
 
         [DllImport("kernel32.dll")]
         static extern bool AttachConsole(uint dwProcessId);
@@ -84,6 +87,7 @@ namespace FileConverter
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            WindowsFontResolver.EnsureInitialized();
 
             // Redirect standard output to the parent process in case the application is launch from command line.
             AttachConsole(ATTACH_PARENT_PROCESS);
@@ -94,6 +98,22 @@ namespace FileConverter
 
             // Navigate to the wanted view.
             INavigationService navigationService = Ioc.Default.GetRequiredService<INavigationService>();
+
+            ISettingsService settingsService = Ioc.Default.GetRequiredService<ISettingsService>();
+            IThemeService themeService = Ioc.Default.GetRequiredService<IThemeService>();
+            themeService.ApplyTheme(settingsService.Settings?.AppTheme ?? "Light", saveToSettings: false);
+
+            if (this.showHub)
+            {
+                navigationService.Show(Pages.Hub);
+                if (!string.IsNullOrEmpty(this.launchToolId))
+                {
+                    FileConverter.ViewModels.HubViewModel hubVm = Ioc.Default.GetRequiredService<FileConverter.ViewModels.HubViewModel>();
+                    hubVm.OpenTool(this.launchToolId, this.launchToolFiles);
+                }
+
+                return;
+            }
 
             if (this.showHelp)
             {
@@ -202,13 +222,16 @@ namespace FileConverter
             services
               .AddSingleton<INavigationService, NavigationService>()
               .AddSingleton<IConversionService, ConversionService>()
-              .AddSingleton<ISettingsService, SettingsService>();
+              .AddSingleton<ISettingsService, SettingsService>()
+              .AddSingleton<IThemeService, ThemeService>()
+              .AddSingleton<IToolCatalogService, ToolCatalogService>();
 
             Ioc.Default.ConfigureServices(services.BuildServiceProvider());
 
             INavigationService navigationService = Ioc.Default.GetRequiredService<INavigationService>();
 
             navigationService.RegisterPage<HelpWindow>(Pages.Help, false, true);
+            navigationService.RegisterPage<HubWindow>(Pages.Hub, false, true);
             navigationService.RegisterPage<MainWindow>(Pages.Main, false, true);
             navigationService.RegisterPage<SettingsWindow>(Pages.Settings, true, true);
             navigationService.RegisterPage<DiagnosticsWindow>(Pages.Diagnostics, true, false);
@@ -238,8 +261,12 @@ namespace FileConverter
 
             if (args.Length == 1)
             {
-                // Display help windows to explain that this application is a context menu extension.
-                this.showHelp = true;
+                this.showHub = true;
+                return;
+            }
+
+            if (this.TryParseHubArguments(args))
+            {
                 return;
             }
 

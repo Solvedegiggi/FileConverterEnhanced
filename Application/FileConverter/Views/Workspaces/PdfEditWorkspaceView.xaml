@@ -1,0 +1,128 @@
+<UserControl x:Class="FileConverter.Views.Workspaces.PdfEditWorkspaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:project="clr-namespace:FileConverter.Properties"
+             xmlns:workspaces="clr-namespace:FileConverter.Views.Workspaces">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <workspaces:WorkspaceHeaderControl Grid.Row="0" />
+
+        <!-- Top Editor Toolbar -->
+        <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="10"
+                Padding="10" Margin="0,0,0,10">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Open PDF..." Style="{StaticResource HubSecondaryButton}" Padding="10,5" Margin="0,2,8,2"
+                        Command="{Binding BrowseFilesCommand}" />
+
+                <RadioButton GroupName="EditMode" Content="✎ Edit Text" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsEditTextMode, Mode=TwoWay}" />
+                <RadioButton GroupName="EditMode" Content="T Add Text" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsAddTextMode, Mode=TwoWay}" />
+                <RadioButton GroupName="EditMode" Content="🖼 Image" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsAddImageMode, Mode=TwoWay}" />
+                <RadioButton GroupName="EditMode" Content="▭ Rect" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsRectMode, Mode=TwoWay}" />
+                <RadioButton GroupName="EditMode" Content="◯ Ellipse" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsEllipseMode, Mode=TwoWay}" />
+                <RadioButton GroupName="EditMode" Content="╱ Line" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsLineMode, Mode=TwoWay}" />
+                <RadioButton GroupName="EditMode" Content="↗ Arrow" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsArrowMode, Mode=TwoWay}" />
+                <RadioButton GroupName="EditMode" Content="🖍 Highlight" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsHighlightMode, Mode=TwoWay}" />
+                <RadioButton GroupName="EditMode" Content="〰 Pen" Margin="2" Padding="8,5"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
+                             IsChecked="{Binding IsFreehandMode, Mode=TwoWay}" />
+
+                <Separator Width="1" Margin="8,2" />
+
+                <ComboBox Width="105" Height="28" Margin="2" ItemsSource="{Binding AvailableFonts}" SelectedItem="{Binding FontFamily}" />
+                <TextBox Width="44" Height="28" Margin="2" Style="{StaticResource ModernInputTextBox}" Padding="6,3" Text="{Binding FontSizePt}" />
+                <ComboBox Width="86" Height="28" Margin="2" IsEditable="True" ItemsSource="{Binding ColorPalette}" Text="{Binding ColorHex}" />
+                <TextBox Width="42" Height="28" Margin="2" Style="{StaticResource ModernInputTextBox}" Padding="6,3" ToolTip="Stroke px" Text="{Binding StrokeWidth}" />
+
+                <Button Content="Pick Image" Style="{StaticResource HubSecondaryButton}" Padding="8,5" Margin="4,2"
+                        Command="{Binding PickImageCommand}" />
+                <Button Content="↶ Undo" Style="{StaticResource HubSecondaryButton}" Padding="8,5" Margin="2"
+                        Command="{Binding UndoCommand}" />
+                <Button Content="↷ Redo" Style="{StaticResource HubSecondaryButton}" Padding="8,5" Margin="2"
+                        Command="{Binding RedoCommand}" />
+
+                <Button Content="◀" Width="28" Height="28" Padding="0" Margin="8,2,2,2" Style="{StaticResource HubSecondaryButton}"
+                        Command="{Binding PrevPageCommand}" />
+                <TextBlock Text="{Binding PageIndicatorText}" VerticalAlignment="Center" Margin="6,2" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+                <Button Content="▶" Width="28" Height="28" Padding="0" Margin="2" Style="{StaticResource HubSecondaryButton}"
+                        Command="{Binding NextPageCommand}" />
+
+                <Slider Width="85" Minimum="0.5" Maximum="2.0" Value="{Binding Zoom}" VerticalAlignment="Center" Margin="8,2" />
+
+                <Button Content="Save PDF" Style="{StaticResource HubPrimaryButton}" Padding="14,6" Margin="6,2,0,2"
+                        Command="{Binding ExecuteCommand}" />
+            </WrapPanel>
+        </Border>
+
+        <!-- Contextual Text Edit / New Text Bar -->
+        <StackPanel Grid.Row="2" Margin="0,0,0,8">
+            <Border Background="{DynamicResource SubtlePanelBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                    CornerRadius="8" Padding="8"
+                    Visibility="{Binding IsAddTextMode, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                <DockPanel>
+                    <TextBlock Text="Text to place on click:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <TextBox Style="{StaticResource ModernInputTextBox}"
+                             Text="{Binding NewTextDraft, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </Border>
+
+            <Border Background="{DynamicResource SubtlePanelBrush}" BorderBrush="{DynamicResource CardHoverBorderBrush}" BorderThickness="1.5"
+                    CornerRadius="8" Padding="8" Margin="0,4,0,0"
+                    Visibility="{Binding HasSelectedTextBlock, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                <DockPanel>
+                    <TextBlock Text="Edit existing text:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <Button Content="Erase Text" DockPanel.Dock="Right" Style="{StaticResource HubSecondaryButton}"
+                            Foreground="#DC2626" Padding="10,4" Margin="6,0,0,0"
+                            Command="{Binding DeleteExistingTextCommand}" />
+                    <Button Content="Replace Text" DockPanel.Dock="Right" Style="{StaticResource HubPrimaryButton}"
+                            Padding="12,5" Margin="8,0,0,0"
+                            Command="{Binding ApplyTextEditCommand}" />
+                    <TextBox Style="{StaticResource ModernInputTextBox}"
+                             Text="{Binding InlineEditText, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Main Interactive Document Stage -->
+        <Border Grid.Row="3" Background="{DynamicResource SubtlePanelBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10"
+                AllowDrop="True" DragOver="Stage_DragOver" Drop="Stage_Drop">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid x:Name="PageStageGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12" Background="White">
+                    <Image x:Name="PreviewImageControl" Source="{Binding PreviewImage}" Stretch="Fill" />
+                    <Canvas x:Name="EditOverlayCanvas"
+                            Background="Transparent"
+                            Cursor="Cross"
+                            MouseLeftButtonDown="EditOverlayCanvas_MouseDown"
+                            MouseMove="EditOverlayCanvas_MouseMove"
+                            MouseLeftButtonUp="EditOverlayCanvas_MouseUp" />
+                </Grid>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

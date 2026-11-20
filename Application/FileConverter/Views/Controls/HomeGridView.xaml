@@ -1,0 +1,194 @@
+<UserControl x:Class="FileConverter.Views.Controls.HomeGridView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:project="clr-namespace:FileConverter.Properties"
+             xmlns:generic="clr-namespace:FileConverter.ValueConverters.Generic">
+    <UserControl.Resources>
+        <generic:HexToBrushConverter x:Key="HexToBrush" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header bar -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel DockPanel.Dock="Left">
+                <TextBlock Text="{x:Static project:Resources.HubNavHome}"
+                           FontSize="22" FontWeight="Bold"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+                <TextBlock Text="{x:Static project:Resources.HubHomeSubtitle}"
+                           FontSize="13" Margin="0,4,0,0"
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <Button Content="{x:Static project:Resources.HubAddToGrid}"
+                        Style="{StaticResource HubPrimaryButton}"
+                        Margin="0,0,8,0"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}"
+                        Command="{Binding OpenAddDrawerCommand}" />
+                <Button Style="{StaticResource HubSecondaryButton}"
+                        Command="{Binding ToggleEditModeCommand}">
+                    <Button.Content>
+                        <TextBlock>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="{x:Static project:Resources.HubConfigureGrid}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditMode}" Value="True">
+                                            <Setter Property="Text" Value="{x:Static project:Resources.HubFinishConfigureGrid}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Cards Grid -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding PinnedTools}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="236" Height="162" Margin="0,0,14,14"
+                                Style="{StaticResource ToolCardBorderStyle}"
+                                AllowDrop="True"
+                                Drop="Card_Drop"
+                                DragOver="Card_DragOver"
+                                MouseLeftButtonUp="Card_MouseLeftButtonUp">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Top icon + New/Edit controls -->
+                                <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                                    <Border Width="42" Height="42" CornerRadius="10"
+                                            Background="{Binding AccentColorHex, Converter={StaticResource HexToBrush}}"
+                                            DockPanel.Dock="Left">
+                                        <TextBlock Text="{Binding BadgeGlyph}"
+                                                   Foreground="White" FontWeight="Bold" FontSize="15"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <Border DockPanel.Dock="Right" CornerRadius="10" Padding="8,3"
+                                            Background="{DynamicResource BadgeNewBackgroundBrush}"
+                                            VerticalAlignment="Top"
+                                            Visibility="{Binding IsNew, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                                        <TextBlock Text="{x:Static project:Resources.HubNewBadge}"
+                                                   Foreground="{DynamicResource BadgeNewForegroundBrush}"
+                                                   FontSize="11" FontWeight="SemiBold" />
+                                    </Border>
+
+                                    <!-- Edit mode reorder / remove buttons -->
+                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                Visibility="{Binding DataContext.IsEditMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                                        <Button Content="←" Width="24" Height="24" Margin="2,0" FontWeight="Bold"
+                                                Command="{Binding DataContext.MoveLeftCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" />
+                                        <Button Content="→" Width="24" Height="24" Margin="2,0" FontWeight="Bold"
+                                                Command="{Binding DataContext.MoveRightCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" />
+                                        <Button Content="✕" Width="24" Height="24" Margin="2,0" Foreground="#DC2626" FontWeight="Bold"
+                                                Command="{Binding DataContext.UnpinToolCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </DockPanel>
+
+                                <TextBlock Grid.Row="1" Text="{Binding Title}"
+                                           FontSize="15" FontWeight="Bold"
+                                           TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" />
+
+                                <TextBlock Grid.Row="2" Text="{Binding Description}"
+                                           FontSize="12" Margin="0,5,0,0"
+                                           TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Add Tool / Preset Picker Overlay -->
+        <Border Grid.RowSpan="2"
+                Background="#88000000"
+                Visibility="{Binding IsAddDrawerOpen, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+            <Border Width="540" MaxHeight="520"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Padding="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock Text="{x:Static project:Resources.HubAddToGrid}"
+                                   FontSize="17" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <Button Content="✕" Width="28" Height="28" DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                Style="{StaticResource HubSecondaryButton}" Padding="0"
+                                Command="{Binding CloseAddDrawerCommand}" />
+                    </DockPanel>
+
+                    <TextBox Grid.Row="1" Margin="0,0,0,12"
+                             Style="{StaticResource ModernInputTextBox}"
+                             Text="{Binding AddFilterText, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding AvailableToolsToAdd}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,0,8" Padding="10" CornerRadius="8"
+                                            Background="{DynamicResource SubtlePanelBrush}"
+                                            BorderBrush="{DynamicResource CardBorderBrush}"
+                                            BorderThickness="1">
+                                        <DockPanel>
+                                            <Border Width="34" Height="34" CornerRadius="8" DockPanel.Dock="Left"
+                                                    Background="{Binding AccentColorHex, Converter={StaticResource HexToBrush}}">
+                                                <TextBlock Text="{Binding BadgeGlyph}" Foreground="White" FontWeight="Bold"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+
+                                            <Button Content="+" Width="34" Height="30" DockPanel.Dock="Right"
+                                                    Style="{StaticResource HubPrimaryButton}" Padding="0"
+                                                    Command="{Binding DataContext.PinToolCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+
+                                            <StackPanel Margin="10,0">
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13.5"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}" />
+                                                <TextBlock Text="{Binding CategoryName}" FontSize="11.5"
+                                                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

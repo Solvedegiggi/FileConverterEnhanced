@@ -2,6 +2,7 @@
 
 namespace FileConverter.ViewModels
 {
+    using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Windows.Input;
@@ -18,6 +19,7 @@ namespace FileConverter.ViewModels
     /// </summary>
     public class MainViewModel : ObservableRecipient
     {
+        private readonly IConversionService conversionService;
         private string informationMessage;
         private ObservableCollection<ConversionJob> conversionJobs;
 
@@ -30,11 +32,15 @@ namespace FileConverter.ViewModels
         /// </summary>
         public MainViewModel()
         {
-            IConversionService settingsService = Ioc.Default.GetRequiredService<IConversionService>();
-            this.ConversionJobs = new ObservableCollection<ConversionJob>(settingsService.ConversionJobs);
+            this.conversionService = Ioc.Default.GetRequiredService<IConversionService>();
+            this.ConversionJobs = new ObservableCollection<ConversionJob>(this.conversionService.ConversionJobs);
+            this.conversionService.ConversionJobsChanged += this.ConversionService_ConversionJobsChanged;
 
             Application application = Application.Current as Application;
-            application.OnApplicationTerminate += this.Application_OnApplicationTerminate;
+            if (application != null)
+            {
+                application.OnApplicationTerminate += this.Application_OnApplicationTerminate;
+            }
         }
 
         public string InformationMessage
@@ -53,11 +59,22 @@ namespace FileConverter.ViewModels
 
             private set
             {
+                if (this.conversionJobs != null)
+                {
+                    foreach (var job in this.conversionJobs)
+                    {
+                        job.PropertyChanged -= this.ConversionJob_PropertyChanged;
+                    }
+                }
+
                 this.SetProperty(ref this.conversionJobs, value);
 
-                foreach (var job in this.conversionJobs)
+                if (this.conversionJobs != null)
                 {
-                    job.PropertyChanged += this.ConversionJob_PropertyChanged;
+                    foreach (var job in this.conversionJobs)
+                    {
+                        job.PropertyChanged += this.ConversionJob_PropertyChanged;
+                    }
                 }
             }
         }
@@ -105,6 +122,23 @@ namespace FileConverter.ViewModels
         {
             INavigationService navigationService = Ioc.Default.GetRequiredService<INavigationService>();
             navigationService.Close(Pages.Main, args != null);
+        }
+
+        private void ConversionService_ConversionJobsChanged(object sender, EventArgs e)
+        {
+            Action sync = () =>
+            {
+                this.ConversionJobs = new ObservableCollection<ConversionJob>(this.conversionService.ConversionJobs);
+            };
+
+            if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.CheckAccess())
+            {
+                Application.Current.Dispatcher.Invoke(sync);
+            }
+            else
+            {
+                sync();
+            }
         }
 
         private void ConversionJob_PropertyChanged(object sender, PropertyChangedEventArgs eventArgs)

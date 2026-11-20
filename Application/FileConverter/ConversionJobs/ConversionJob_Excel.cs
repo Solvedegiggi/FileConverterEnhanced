@@ -32,7 +32,7 @@ namespace FileConverter.ConversionJobs
 
         protected override int GetOutputFilesCount()
         {
-            if (this.ConversionPreset.OutputType == OutputType.Pdf)
+            if (this.ConversionPreset.OutputType == OutputType.Pdf || !this.ShouldUseMicrosoftOfficeInterop())
             {
                 return 1;
             }
@@ -94,27 +94,77 @@ namespace FileConverter.ConversionJobs
                 throw new System.Exception("The conversion preset must be valid.");
             }
 
-            this.UserState = Properties.Resources.ConversionStateReadDocument;
+            string excelOrientation = this.ConversionPreset.GetSettingsValue(ConversionPreset.ConversionSettingKeys.ExcelPageOrientation) ?? "Default";
+            bool fitColumns = string.Equals(
+                this.ConversionPreset.GetSettingsValue(ConversionPreset.ConversionSettingKeys.ExcelFitColumnsToPage),
+                "True",
+                StringComparison.OrdinalIgnoreCase);
 
-            if (!this.TryLoadDocumentIfNecessary())
+            if (this.UseLibreOfficeFallback)
             {
-                this.ConversionFailed(Properties.Resources.ErrorUnableToUseMicrosoftOffice);
-                return;
+                this.UserState = Properties.Resources.ConversionStateConversion;
+                string ext = Path.GetExtension(this.InputFilePath ?? string.Empty).ToLowerInvariant();
+                if (ext == ".xlsx" && (fitColumns || !string.Equals(excelOrientation, "Default", StringComparison.OrdinalIgnoreCase)))
+                {
+                    Services.NativeOfficeToPdfConverter.ConvertXlsxToPdf(this.InputFilePath, this.intermediateFilePath, excelOrientation, fitColumns);
+                }
+                else if (!Services.LibreOfficeHelper.ConvertToPdf(this.InputFilePath, this.intermediateFilePath, out string loError))
+                {
+                    this.ConversionFailed(loError);
+                    return;
+                }
             }
+            else if (this.UseNativeFallback)
+            {
+                this.UserState = Properties.Resources.ConversionStateConversion;
+                Services.NativeOfficeToPdfConverter.ConvertXlsxToPdf(this.InputFilePath, this.intermediateFilePath, excelOrientation, fitColumns);
+            }
+            else
+            {
+                this.UserState = Properties.Resources.ConversionStateReadDocument;
 
-            // Make this document the active document.
-            this.document.Activate();
+                if (!this.TryLoadDocumentIfNecessary())
+                {
+                    this.ConversionFailed(Properties.Resources.ErrorUnableToUseMicrosoftOffice);
+                    return;
+                }
 
-            this.UserState = Properties.Resources.ConversionStateConversion;
+                // Make this document the active document.
+                this.document.Activate();
 
-            Debug.Log("Convert excel document to pdf.");
-            this.document.ExportAsFixedFormat(Excel.Enums.XlFixedFormatType.xlTypePDF, this.intermediateFilePath);
+                foreach (object sheet in this.document.Sheets)
+                {
+                    if (sheet is Excel.Worksheet worksheet)
+                    {
+                        if (string.Equals(excelOrientation, "Portrait", StringComparison.OrdinalIgnoreCase))
+                        {
+                            worksheet.PageSetup.Orientation = Excel.Enums.XlPageOrientation.xlPortrait;
+                        }
+                        else if (string.Equals(excelOrientation, "Landscape", StringComparison.OrdinalIgnoreCase))
+                        {
+                            worksheet.PageSetup.Orientation = Excel.Enums.XlPageOrientation.xlLandscape;
+                        }
 
-            Debug.Log($"Close excel document '{this.InputFilePath}'.");
-            this.document.Close(false);
-            this.document = null;
+                        if (fitColumns)
+                        {
+                            worksheet.PageSetup.Zoom = false;
+                            worksheet.PageSetup.FitToPagesWide = 1;
+                            worksheet.PageSetup.FitToPagesTall = false;
+                        }
+                    }
+                }
 
-            this.ReleaseOfficeApplicationInstanceIfNeeded();
+                this.UserState = Properties.Resources.ConversionStateConversion;
+
+                Debug.Log("Convert excel document to pdf.");
+                this.document.ExportAsFixedFormat(Excel.Enums.XlFixedFormatType.xlTypePDF, this.intermediateFilePath);
+
+                Debug.Log($"Close excel document '{this.InputFilePath}'.");
+                this.document.Close(false);
+                this.document = null;
+
+                this.ReleaseOfficeApplicationInstanceIfNeeded();
+            }
             
             if (this.pdf2ImageConversionJob != null)
             {

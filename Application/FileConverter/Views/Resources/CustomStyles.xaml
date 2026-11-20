@@ -169,6 +169,7 @@
 
     <Style TargetType="{x:Type Window}">
         <Setter Property="Background" Value="{DynamicResource Window_BackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
 </ResourceDictionary>

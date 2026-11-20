@@ -19,6 +19,24 @@ namespace FileConverter.Services
                     this.MigrateConversionPresetToCurrentVersion(conversionPreset, settingsVersion);
                 }
             }
+
+            if (settingsVersion <= 4)
+            {
+                if (string.IsNullOrEmpty(settings.AppTheme))
+                {
+                    settings.AppTheme = "Light";
+                }
+
+                if (string.IsNullOrEmpty(settings.OcrDefaultLanguages))
+                {
+                    settings.OcrDefaultLanguages = "ita+eng";
+                }
+
+                if (settings.PinnedQuickToolIds == null || settings.PinnedQuickToolIds.Count == 0)
+                {
+                    settings.PinnedQuickToolIds = Settings.CreateDefaultPinnedQuickToolIds();
+                }
+            }
         }
 
         private void MigrateConversionPresetToCurrentVersion(ConversionPreset preset, int settingsVersion)

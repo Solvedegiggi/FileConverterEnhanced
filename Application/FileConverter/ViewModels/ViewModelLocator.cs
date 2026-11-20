@@ -31,6 +31,8 @@ namespace FileConverter.ViewModels
 
         public HelpViewModel Help => Ioc.Default.GetRequiredService<HelpViewModel>();
 
+        public HubViewModel Hub => Ioc.Default.GetRequiredService<HubViewModel>();
+
         public MainViewModel Main => Ioc.Default.GetRequiredService<MainViewModel>();
 
         public UpgradeViewModel Upgrade => Ioc.Default.GetRequiredService<UpgradeViewModel>();
@@ -43,6 +45,7 @@ namespace FileConverter.ViewModels
         {
             services
                 .AddSingleton<HelpViewModel>()
+                .AddSingleton<HubViewModel>()
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<UpgradeViewModel>()
                 .AddSingleton<SettingsViewModel>()

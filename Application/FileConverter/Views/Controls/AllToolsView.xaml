@@ -1,0 +1,94 @@
+<UserControl x:Class="FileConverter.Views.Controls.AllToolsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:project="clr-namespace:FileConverter.Properties"
+             xmlns:generic="clr-namespace:FileConverter.ValueConverters.Generic">
+    <UserControl.Resources>
+        <generic:HexToBrushConverter x:Key="HexToBrush" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="{x:Static project:Resources.HubNavAllTools}"
+                   FontSize="22" FontWeight="Bold" Margin="0,0,0,16"
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding AllPdfTools}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="236" Height="168" Margin="0,0,14,14"
+                                Style="{StaticResource ToolCardBorderStyle}"
+                                AllowDrop="True"
+                                Drop="Card_Drop"
+                                DragOver="Card_DragOver"
+                                MouseLeftButtonUp="Card_MouseLeftButtonUp">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                                    <Border Width="42" Height="42" CornerRadius="10" DockPanel.Dock="Left"
+                                            Background="{Binding AccentColorHex, Converter={StaticResource HexToBrush}}">
+                                        <TextBlock Text="{Binding BadgeGlyph}" Foreground="White" FontWeight="Bold" FontSize="15"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <Button DockPanel.Dock="Right" Width="28" Height="28" Margin="4,0,0,0"
+                                            Style="{StaticResource HubSecondaryButton}" Padding="0"
+                                            ToolTip="Pin / Unpin"
+                                            Command="{Binding DataContext.TogglePinToolCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}">
+                                        <TextBlock FontSize="14">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="☆" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                                                            <Setter Property="Text" Value="★" />
+                                                            <Setter Property="Foreground" Value="#EAB308" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Button>
+
+                                    <Border DockPanel.Dock="Right" CornerRadius="10" Padding="8,3"
+                                            Background="{DynamicResource BadgeNewBackgroundBrush}"
+                                            VerticalAlignment="Top"
+                                            Visibility="{Binding IsNew, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                                        <TextBlock Text="{x:Static project:Resources.HubNewBadge}"
+                                                   Foreground="{DynamicResource BadgeNewForegroundBrush}"
+                                                   FontSize="11" FontWeight="SemiBold" />
+                                    </Border>
+                                </DockPanel>
+
+                                <TextBlock Grid.Row="1" Text="{Binding Title}" FontSize="15" FontWeight="Bold"
+                                           TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" />
+
+                                <TextBlock Grid.Row="2" Text="{Binding Description}" FontSize="12" Margin="0,5,0,0"
+                                           TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

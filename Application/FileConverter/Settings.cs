@@ -13,7 +13,7 @@ namespace FileConverter
     [XmlType]
     public class Settings : ObservableObject, IXmlSerializable
     {
-        public const int Version = 4;
+        public const int Version = 5;
 
         private bool exitApplicationWhenConversionsFinished = false;
         private float durationBetweenEndOfConversionsAndApplicationExit = 3f;
@@ -23,6 +23,35 @@ namespace FileConverter
         private int maximumNumberOfSimultaneousConversions;
         private bool copyFilesInClipboardAfterConversion = false;
         private Helpers.HardwareAccelerationMode hardwareAccelerationMode = Helpers.HardwareAccelerationMode.Off;
+        private string appTheme = "Light";
+        private string ocrDefaultLanguages = "ita+eng";
+        private bool preferOfficeInteropWhenAvailable = true;
+        private ObservableCollection<string> pinnedQuickToolIds = CreateDefaultPinnedQuickToolIds();
+
+        public static ObservableCollection<string> CreateDefaultPinnedQuickToolIds()
+        {
+            return new ObservableCollection<string>
+            {
+                "MergePdf",
+                "SplitPdf",
+                "CompressPdf",
+                "PdfToWord",
+                "PdfToPowerPoint",
+                "PdfToExcel",
+                "WordToPdf",
+                "PowerPointToPdf",
+                "ExcelToPdf",
+                "EditPdf",
+                "PdfToJpg",
+                "JpgToPdf",
+                "RotatePdf",
+                "HtmlToPdf",
+                "preset:To Mp4",
+                "preset:To Mp3",
+                "preset:To Png",
+                "preset:To Webp",
+            };
+        }
 
         public ConversionPreset GetPresetFromName(string presetName)
         {
@@ -36,14 +65,14 @@ namespace FileConverter
                 this.ConversionPresets[index].Clean();
             }
         }
-        
+
         public Settings Merge(Settings settings)
         {
             if (settings == null || settings.conversionPresets == null)
             {
                 return this;
             }
-            
+
             for (int index = 0; index < settings.conversionPresets.Count; index++)
             {
                 ConversionPreset conversionPreset = settings.conversionPresets[index];
@@ -53,6 +82,13 @@ namespace FileConverter
                 }
 
                 this.conversionPresets.Add(conversionPreset);
+            }
+
+            if ((this.pinnedQuickToolIds == null || this.pinnedQuickToolIds.Count == 0) &&
+                settings.PinnedQuickToolIds != null &&
+                settings.PinnedQuickToolIds.Count > 0)
+            {
+                this.pinnedQuickToolIds = new ObservableCollection<string>(settings.PinnedQuickToolIds);
             }
 
             return this;
@@ -237,9 +273,70 @@ namespace FileConverter
                 this.OnPropertyChanged();
             }
         }
+
+        [XmlElement]
+        public string AppTheme
+        {
+            get => this.appTheme;
+            set
+            {
+                this.appTheme = string.IsNullOrEmpty(value) ? "Light" : value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        [XmlElement]
+        public string OcrDefaultLanguages
+        {
+            get => this.ocrDefaultLanguages;
+            set
+            {
+                this.ocrDefaultLanguages = string.IsNullOrEmpty(value) ? "ita+eng" : value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        [XmlElement]
+        public bool PreferOfficeInteropWhenAvailable
+        {
+            get => this.preferOfficeInteropWhenAvailable;
+            set
+            {
+                this.preferOfficeInteropWhenAvailable = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        [XmlArray("PinnedQuickToolIds")]
+        [XmlArrayItem("ToolId")]
+        public ObservableCollection<string> PinnedQuickToolIds
+        {
+            get => this.pinnedQuickToolIds;
+            set
+            {
+                this.pinnedQuickToolIds = value ?? CreateDefaultPinnedQuickToolIds();
+                this.OnPropertyChanged();
+            }
+        }
+
         public void OnDeserializationComplete()
         {
             this.DurationBetweenEndOfConversionsAndApplicationExit = System.Math.Max(0, System.Math.Min(10, this.DurationBetweenEndOfConversionsAndApplicationExit));
+
+            if (string.IsNullOrEmpty(this.AppTheme))
+            {
+                this.AppTheme = "Light";
+            }
+
+            if (string.IsNullOrEmpty(this.OcrDefaultLanguages))
+            {
+                this.OcrDefaultLanguages = "ita+eng";
+            }
+
+            if (this.PinnedQuickToolIds == null || this.PinnedQuickToolIds.Count == 0)
+            {
+                this.PinnedQuickToolIds = CreateDefaultPinnedQuickToolIds();
+            }
 
             for (int index = 0; index < this.ConversionPresets.Count; index++)
             {

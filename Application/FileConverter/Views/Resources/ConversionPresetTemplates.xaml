@@ -615,6 +615,41 @@
         </Grid>
     </DataTemplate>
 
+    <DataTemplate x:Key="PdfSettingsDataTemplate" DataType="{x:Type fileConverter:ConversionPreset}">
+        <StackPanel Margin="0,6,0,0">
+            <TextBlock Text="{x:Static project:Resources.SettingExcelOrientation}" FontWeight="SemiBold" Margin="0,0,0,4" />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <RadioButton Content="{x:Static project:Resources.SettingOrientationDefault}" Margin="0,0,12,0"
+                             IsChecked="{Binding Settings, ConverterParameter=ExcelPageOrientation|Default, Converter={StaticResource ConversionSettingsEquals}, Mode=TwoWay}" />
+                <RadioButton Content="{x:Static project:Resources.SettingOrientationPortrait}" Margin="0,0,12,0"
+                             IsChecked="{Binding Settings, ConverterParameter=ExcelPageOrientation|Portrait, Converter={StaticResource ConversionSettingsEquals}, Mode=TwoWay}" />
+                <RadioButton Content="{x:Static project:Resources.SettingOrientationLandscape}"
+                             IsChecked="{Binding Settings, ConverterParameter=ExcelPageOrientation|Landscape, Converter={StaticResource ConversionSettingsEquals}, Mode=TwoWay}" />
+            </StackPanel>
+            <CheckBox Content="{x:Static project:Resources.SettingExcelFitColumns}" Margin="0,0,0,10"
+                      IsChecked="{Binding Settings, ConverterParameter=ExcelFitColumnsToPage|System.Boolean, Converter={StaticResource ConversionSettingsToValueType}, Mode=TwoWay}" />
+
+            <TextBlock Text="{x:Static project:Resources.ToolCompressPdfTitle}" FontWeight="SemiBold" Margin="0,4,0,4" />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <RadioButton Content="Extreme" Margin="0,0,12,0"
+                             IsChecked="{Binding Settings, ConverterParameter=PdfCompressionLevel|Extreme, Converter={StaticResource ConversionSettingsEquals}, Mode=TwoWay}" />
+                <RadioButton Content="Recommended" Margin="0,0,12,0"
+                             IsChecked="{Binding Settings, ConverterParameter=PdfCompressionLevel|Recommended, Converter={StaticResource ConversionSettingsEquals}, Mode=TwoWay}" />
+                <RadioButton Content="Low"
+                             IsChecked="{Binding Settings, ConverterParameter=PdfCompressionLevel|Low, Converter={StaticResource ConversionSettingsEquals}, Mode=TwoWay}" />
+            </StackPanel>
+        </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate x:Key="PdfToOfficeSettingsDataTemplate" DataType="{x:Type fileConverter:ConversionPreset}">
+        <StackPanel Margin="0,6,0,0">
+            <RadioButton Content="Native Offline Engine" Margin="0,0,0,6"
+                         IsChecked="{Binding Settings, ConverterParameter=PdfToOfficeEngine|Native, Converter={StaticResource ConversionSettingsEquals}, Mode=TwoWay}" />
+            <RadioButton Content="Microsoft Word Interop (if installed)"
+                         IsChecked="{Binding Settings, ConverterParameter=PdfToOfficeEngine|OfficeInterop, Converter={StaticResource ConversionSettingsEquals}, Mode=TwoWay}" />
+        </StackPanel>
+    </DataTemplate>
+
     <Style x:Key="OutputTypeSelectorStyle" TargetType="{x:Type ContentControl}">
         <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}"/>
         <Style.Triggers>
@@ -623,6 +658,12 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding OutputType}" Value="Avi">
                 <Setter Property="ContentTemplate" Value="{StaticResource AviSettingsDataTemplate}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding OutputType}" Value="Avif">
+                <Setter Property="ContentTemplate" Value="{StaticResource JpgSettingsDataTemplate}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding OutputType}" Value="Docx">
+                <Setter Property="ContentTemplate" Value="{StaticResource PdfToOfficeSettingsDataTemplate}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding OutputType}" Value="Flac">
                 <Setter Property="ContentTemplate" Value="{StaticResource FlacSettingsDataTemplate}"/>
@@ -647,6 +688,9 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding OutputType}" Value="Ogv">
                 <Setter Property="ContentTemplate" Value="{StaticResource OgvSettingsDataTemplate}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding OutputType}" Value="Pdf">
+                <Setter Property="ContentTemplate" Value="{StaticResource PdfSettingsDataTemplate}"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding OutputType}" Value="Png">
                 <Setter Property="ContentTemplate" Value="{StaticResource PngSettingsDataTemplate}"/>
@@ -704,6 +748,15 @@
         <Setter Property="ContentTemplate" Value="{StaticResource EmptyCustomSettingsDataTemplate}"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding SelectedPreset.Preset.Settings, Converter={StaticResource ConversionSettingsRelevant}, ConverterParameter=EnableFFMPEGCustomCommand}" Value="True">
+                <Setter Property="ContentTemplate" Value="{StaticResource CustomSettingsDataTemplate}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DirectPresetSettingsSelectorStyle" TargetType="{x:Type ContentControl}">
+        <Setter Property="ContentTemplate" Value="{StaticResource EmptyCustomSettingsDataTemplate}"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Settings, Converter={StaticResource ConversionSettingsRelevant}, ConverterParameter=EnableFFMPEGCustomCommand}" Value="True">
                 <Setter Property="ContentTemplate" Value="{StaticResource CustomSettingsDataTemplate}"/>
             </DataTrigger>
         </Style.Triggers>

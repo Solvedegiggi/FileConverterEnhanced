@@ -458,28 +458,28 @@
 
                     <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0">
                         <Button ToolTip="{x:Static project:Resources.GitHubButtonDescription}" Padding="1" Margin="5,0,5,0" 
-                                Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://github.com/Tichau/FileConverter/?from=about"
+                                Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://github.com/Solvedegiggi/FileConverterEnhanced"
                                 Style="{DynamicResource TileButton}">
                             <Button.Content>
                                 <Image Source="/FileConverter;component/Resources/GitHub-Icon.png"></Image>
                             </Button.Content>
                         </Button>
                         <Button ToolTip="{x:Static project:Resources.IssueButtonDescription}" Padding="1" Margin="5,0,5,0" 
-                                Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://github.com/Tichau/FileConverter/issues?from=about"
+                                Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://github.com/Solvedegiggi/FileConverterEnhanced/issues"
                                 Style="{DynamicResource TileButton}">
                             <Button.Content>
                                 <Image Source="/FileConverter;component/Resources/GitHub-Issue-Icon.png"></Image>
                             </Button.Content>
                         </Button>
                         <Button ToolTip="{x:Static project:Resources.DocumentationButtonDescription}" Padding="1" Margin="5,0,5,0" 
-                                Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://github.com/Tichau/FileConverter/wiki?from=about"
+                                Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://github.com/Solvedegiggi/FileConverterEnhanced/releases"
                                 Style="{DynamicResource TileButton}">
                             <Button.Content>
                                 <Image Source="/FileConverter;component/Resources/GitHub-Documentation-Icon.png"></Image>
                             </Button.Content>
                         </Button>
-                        <Button ToolTip="{x:Static project:Resources.WebsiteButtonDescription}" Padding="1" Margin="5,0,5,0" 
-                                Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://file-converter.io?from=about"
+                        <Button ToolTip="Upstream original project (Tichau/FileConverter)" Padding="1" Margin="5,0,5,0" 
+                                Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://github.com/Tichau/FileConverter"
                                 Style="{DynamicResource TileButton}">
                             <Button.Content>
                                 <Image Source="/FileConverter;component/Resources/WebSite-Icon.png"></Image>
@@ -487,7 +487,10 @@
                         </Button>
                     </StackPanel>
 
-                    <Label Grid.Row="3" Grid.Column="0" Content="Copyright @ 2026, Adrien Allard. All right reserved." Foreground="{DynamicResource LighterForegroundBrush}" Margin="0,2,0,2"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Foreground="{DynamicResource LighterForegroundBrush}" Margin="0,4,0,2">
+                        FileConverterEnhanced fork by Solvedegiggi • Upstream project:
+                        <Hyperlink Command="{Binding OpenUrlCommand, Mode=OneWay}" CommandParameter="https://github.com/Tichau/FileConverter">Tichau/FileConverter (GPLv3)</Hyperlink>
+                    </TextBlock>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -6,7 +6,7 @@ namespace FileConverter
     using System.Collections.Generic;
     using System.Globalization;
     using System.Xml.Serialization;
-    
+
     using CommunityToolkit.Mvvm.ComponentModel;
 
     using FileConverter.Controls;
@@ -128,7 +128,7 @@ namespace FileConverter
             set
             {
                 this.outputType = value;
-                this.InitializeDefaultSettings(this.outputType);
+                this.InitializeDefaultSettings(this.outputType, clearExisting: true);
                 this.OnPropertyChanged();
                 this.CoerceInputTypes();
             }
@@ -156,7 +156,7 @@ namespace FileConverter
                 {
                     this.inputTypes[index] = this.inputTypes[index].ToLowerInvariant();
                 }
-                
+
                 this.OnPropertyChanged();
             }
         }
@@ -292,9 +292,17 @@ namespace FileConverter
 
         public void OnDeserializationComplete()
         {
-            for (int index = 0; index < this.InputTypes.Count; index++)
+            if (this.InputTypes != null)
             {
-                this.InputTypes[index] = this.InputTypes[index].ToLowerInvariant();
+                for (int index = 0; index < this.InputTypes.Count; index++)
+                {
+                    this.InputTypes[index] = this.InputTypes[index].ToLowerInvariant();
+                }
+            }
+
+            if (this.OutputType != OutputType.None)
+            {
+                this.InitializeDefaultSettings(this.OutputType, clearExisting: false);
             }
 
             this.CoerceInputTypes();
@@ -399,8 +407,7 @@ namespace FileConverter
             for (int index = 0; index < this.inputTypes.Count; index++)
             {
                 string inputType = this.inputTypes[index];
-                string inputCategory = Helpers.GetExtensionCategory(inputType);
-                if (!Helpers.IsOutputTypeCompatibleWithCategory(this.OutputType, inputCategory))
+                if (!Helpers.IsOutputTypeCompatibleWithExtension(this.OutputType, inputType))
                 {
                     this.RemoveInputType(inputType);
                     index--;
@@ -408,137 +415,142 @@ namespace FileConverter
             }
         }
 
-        private void InitializeDefaultSettings(OutputType outputType)
+        private void InitializeDefaultSettings(OutputType outputType, bool clearExisting)
         {
-            this.settings.Clear();
+            if (clearExisting)
+            {
+                this.settings.Clear();
+            }
 
             switch (outputType)
             {
                 // Audio
                 case OutputType.Aac:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioBitrate, "128");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioChannelCount, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioBitrate, "128");
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioChannelCount, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 case OutputType.Flac:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioChannelCount, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioChannelCount, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 case OutputType.Ogg:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioBitrate, "160");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioChannelCount, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioBitrate, "160");
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioChannelCount, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 case OutputType.Mp3:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioEncodingMode, EncodingMode.Mp3VBR.ToString(), true);
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioBitrate, "190");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioChannelCount, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioEncodingMode, EncodingMode.Mp3VBR.ToString(), clearExisting);
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioBitrate, "190");
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioChannelCount, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 case OutputType.Wav:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioEncodingMode, EncodingMode.Wav16.ToString(), true);
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioChannelCount, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioEncodingMode, EncodingMode.Wav16.ToString(), clearExisting);
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioChannelCount, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 // Video
                 case OutputType.Avi:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableAudio, "True");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoQuality, "20");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioBitrate, "190");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableAudio, "True");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoQuality, "20");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioBitrate, "190");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 case OutputType.Mkv:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableAudio, "True");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoQuality, "28");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoEncodingSpeed, "Medium");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioBitrate, "128");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableAudio, "True");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoQuality, "28");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoEncodingSpeed, "Medium");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioBitrate, "128");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 case OutputType.Mp4:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableAudio, "True");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoQuality, "28");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoEncodingSpeed, "Medium");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioBitrate, "128");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableAudio, "True");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoQuality, "28");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoEncodingSpeed, "Medium");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioBitrate, "128");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 case OutputType.Ogv:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableAudio, "True");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoQuality, "7");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioBitrate, "160");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableAudio, "True");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoQuality, "7");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioBitrate, "160");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 case OutputType.Webm:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableAudio, "True");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.AudioBitrate, "160");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoQuality, "40");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableAudio, "True");
+                    this.InitializeSettingsValue(ConversionSettingKeys.AudioBitrate, "160");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoQuality, "40");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.EnableFFMPEGCustomCommand, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.FFMPEGCustomCommand, string.Empty);
                     break;
 
                 // Images
                 case OutputType.Avif:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageQuality, "50");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageClampSizePowerOf2, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageMaximumSize, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageQuality, "50");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageClampSizePowerOf2, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageMaximumSize, "0");
                     break;
 
                 case OutputType.Gif:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.VideoFramesPerSecond, "15");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.VideoFramesPerSecond, "15");
                     break;
 
                 case OutputType.Png:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageClampSizePowerOf2, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageMaximumSize, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageClampSizePowerOf2, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageMaximumSize, "0");
                     break;
 
                 case OutputType.Jpg:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageQuality, "90");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageClampSizePowerOf2, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageMaximumSize, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageQuality, "90");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageClampSizePowerOf2, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageMaximumSize, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfToImageMode, "PagesToImages");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfRenderDpi, "200");
                     break;
 
                 case OutputType.Webp:
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageQuality, "40");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageScale, "1");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageRotation, "0");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageClampSizePowerOf2, "False");
-                    this.InitializeSettingsValue(ConversionPreset.ConversionSettingKeys.ImageMaximumSize, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageQuality, "40");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageScale, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageRotation, "0");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageClampSizePowerOf2, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageMaximumSize, "0");
                     break;
 
                 case OutputType.Ico:
@@ -546,6 +558,43 @@ namespace FileConverter
 
                 // Documents
                 case OutputType.Pdf:
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfOperationMode, "None");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfCompressionLevel, "Recommended");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfRotationAngle, "90");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageRange, string.Empty);
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfSplitMode, "SplitAllPages");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfSplitEveryNPages, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageSize, "A4");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageOrientation, "Auto");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageMargin, "Small");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ImageToPdfMerge, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageNumberPosition, "BottomCenter");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageNumberFormat, "{n} / {total}");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageNumberFont, "Arial");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageNumberFontSize, "11");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageNumberColor, "#333333");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageNumberStartPage, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageNumberStartNumber, "1");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfPageNumberMargin, "12");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ExcelPageOrientation, "Default");
+                    this.InitializeSettingsValue(ConversionSettingKeys.ExcelFitColumnsToPage, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.OcrLanguages, "ita+eng");
+                    this.InitializeSettingsValue(ConversionSettingKeys.OcrSkipTextPages, "True");
+                    this.InitializeSettingsValue(ConversionSettingKeys.HtmlPageOrientation, "Portrait");
+                    this.InitializeSettingsValue(ConversionSettingKeys.HtmlPageSize, "A4");
+                    this.InitializeSettingsValue(ConversionSettingKeys.HtmlPrintBackground, "True");
+                    this.InitializeSettingsValue(ConversionSettingKeys.HtmlDelayMs, "500");
+                    break;
+
+                case OutputType.Docx:
+                case OutputType.Pptx:
+                case OutputType.Xlsx:
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfToOfficeEngine, "Native");
+                    break;
+
+                case OutputType.Md:
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfMarkdownExtractImages, "False");
+                    this.InitializeSettingsValue(ConversionSettingKeys.PdfMarkdownIncludePageBreaks, "False");
                     break;
 
                 default:
@@ -620,6 +669,38 @@ namespace FileConverter
             public const string EnableAudio = "EnableAudio";
             public const string EnableVideo = "EnableVideo";
             public const string EnableFFMPEGCustomCommand = "EnableFFMPEGCustomCommand";
+
+            public const string PdfOperationMode = "PdfOperationMode";
+            public const string PdfCompressionLevel = "PdfCompressionLevel";
+            public const string PdfRotationAngle = "PdfRotationAngle";
+            public const string PdfPageRange = "PdfPageRange";
+            public const string PdfSplitMode = "PdfSplitMode";
+            public const string PdfSplitEveryNPages = "PdfSplitEveryNPages";
+            public const string PdfToImageMode = "PdfToImageMode";
+            public const string PdfRenderDpi = "PdfRenderDpi";
+            public const string PdfPageSize = "PdfPageSize";
+            public const string PdfPageOrientation = "PdfPageOrientation";
+            public const string PdfPageMargin = "PdfPageMargin";
+            public const string ImageToPdfMerge = "ImageToPdfMerge";
+            public const string PdfPageNumberPosition = "PdfPageNumberPosition";
+            public const string PdfPageNumberFormat = "PdfPageNumberFormat";
+            public const string PdfPageNumberFont = "PdfPageNumberFont";
+            public const string PdfPageNumberFontSize = "PdfPageNumberFontSize";
+            public const string PdfPageNumberColor = "PdfPageNumberColor";
+            public const string PdfPageNumberStartPage = "PdfPageNumberStartPage";
+            public const string PdfPageNumberStartNumber = "PdfPageNumberStartNumber";
+            public const string PdfPageNumberMargin = "PdfPageNumberMargin";
+            public const string ExcelPageOrientation = "ExcelPageOrientation";
+            public const string ExcelFitColumnsToPage = "ExcelFitColumnsToPage";
+            public const string OcrLanguages = "OcrLanguages";
+            public const string OcrSkipTextPages = "OcrSkipTextPages";
+            public const string PdfMarkdownExtractImages = "PdfMarkdownExtractImages";
+            public const string PdfMarkdownIncludePageBreaks = "PdfMarkdownIncludePageBreaks";
+            public const string PdfToOfficeEngine = "PdfToOfficeEngine";
+            public const string HtmlPageOrientation = "HtmlPageOrientation";
+            public const string HtmlPageSize = "HtmlPageSize";
+            public const string HtmlPrintBackground = "HtmlPrintBackground";
+            public const string HtmlDelayMs = "HtmlDelayMs";
         }
     }
 }

@@ -1,0 +1,60 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+
+      - name: Build FileConverterExtension (Release x64)
+        run: msbuild Application\FileConverterExtension\FileConverterExtension.csproj /t:Restore,Build /p:Configuration=Release /p:Platform=x64 /v:minimal
+
+      - name: Build FileConverter (Release x64)
+        run: dotnet build Application\FileConverter\FileConverter.csproj -c Release -p:Platform=x64 -m:1 -v:minimal
+
+      - name: Run Automated Unit Tests
+        run: |
+          dotnet build Application\FileConverter.Tests\FileConverter.Tests.csproj -c Release -p:Platform=x64 --no-dependencies -m:1 -v:minimal
+          dotnet test Application\FileConverter.Tests\FileConverter.Tests.csproj -c Release -p:Platform=x64 --no-build --verbosity normal
+
+      - name: Build WiX 5 MSI Installer
+        run: dotnet build Installer\Installer.wixproj -c Release -p:Platform=x64 --no-dependencies -m:1 -v:minimal
+
+      - name: Prepare Release Assets
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag.StartsWith("v")) { $tag = "v2.3.0" }
+          $ver = $tag.TrimStart("v")
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item "Installer\bin\x64\Release\FileConverter-setup.msi" "dist\FileConverter-$ver-x64-setup.msi"
+          Copy-Item "version.xml" "dist\version.xml"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/FileConverter-*-x64-setup.msi
+            dist/version.xml
+          generate_release_notes: true

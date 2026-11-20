@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SerializationVersion="4">
+<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SerializationVersion="5">
     <MaximumNumberOfSimultaneousConversions>2</MaximumNumberOfSimultaneousConversions>
     <ConversionPreset Name="To Mkv" OutputType="Mkv" IsDefaultSettings="true">
         <InputTypes>3gp</InputTypes>
@@ -2112,6 +2112,95 @@
         <Settings Key="FFMPEGCustomCommand" Value="-filter:a &quot;rubberband=pitch=1.059463094352953&quot;" />
         <OutputFileNameTemplate>(p)(f) (+1st)</OutputFileNameTemplate>
     </ConversionPreset>
+    <ConversionPreset Name="To Word (DOCX)" OutputType="Docx" IsDefaultSettings="true">
+        <InputTypes>pdf</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="PdfToOfficeEngine" Value="Native" />
+        <OutputFileNameTemplate>(p)(f)</OutputFileNameTemplate>
+    </ConversionPreset>
+    <ConversionPreset Name="To PowerPoint (PPTX)" OutputType="Pptx" IsDefaultSettings="true">
+        <InputTypes>pdf</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="PdfToOfficeEngine" Value="Native" />
+        <OutputFileNameTemplate>(p)(f)</OutputFileNameTemplate>
+    </ConversionPreset>
+    <ConversionPreset Name="To Excel (XLSX)" OutputType="Xlsx" IsDefaultSettings="true">
+        <InputTypes>pdf</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="PdfToOfficeEngine" Value="Native" />
+        <OutputFileNameTemplate>(p)(f)</OutputFileNameTemplate>
+    </ConversionPreset>
+    <ConversionPreset Name="To Markdown" OutputType="Md" IsDefaultSettings="true">
+        <InputTypes>pdf</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="PdfMarkdownExtractImages" Value="False" />
+        <Settings Key="PdfMarkdownIncludePageBreaks" Value="False" />
+        <OutputFileNameTemplate>(p)(f)</OutputFileNameTemplate>
+    </ConversionPreset>
+    <ConversionPreset Name="Compress PDF" OutputType="Pdf" IsDefaultSettings="true">
+        <InputTypes>pdf</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="PdfOperationMode" Value="Compress" />
+        <Settings Key="PdfCompressionLevel" Value="Recommended" />
+        <OutputFileNameTemplate>(p)(f)_compressed</OutputFileNameTemplate>
+    </ConversionPreset>
+    <ConversionPreset Name="OCR PDF" OutputType="Pdf" IsDefaultSettings="true">
+        <InputTypes>pdf</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="PdfOperationMode" Value="Ocr" />
+        <Settings Key="OcrLanguages" Value="ita+eng" />
+        <Settings Key="OcrSkipTextPages" Value="True" />
+        <OutputFileNameTemplate>(p)(f)_ocr</OutputFileNameTemplate>
+    </ConversionPreset>
+    <ConversionPreset Name="Rotate PDF 90" OutputType="Pdf" IsDefaultSettings="true">
+        <InputTypes>pdf</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="PdfOperationMode" Value="Rotate" />
+        <Settings Key="PdfRotationAngle" Value="90" />
+        <OutputFileNameTemplate>(p)(f)_rotated</OutputFileNameTemplate>
+    </ConversionPreset>
+    <ConversionPreset Name="To Pdf (HTML)" OutputType="Pdf" IsDefaultSettings="true">
+        <InputTypes>html</InputTypes>
+        <InputTypes>htm</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="HtmlPageSize" Value="A4" />
+        <Settings Key="HtmlPageOrientation" Value="Portrait" />
+        <Settings Key="HtmlPrintBackground" Value="True" />
+        <Settings Key="HtmlDelayMs" Value="500" />
+        <OutputFileNameTemplate>(p)(f)</OutputFileNameTemplate>
+    </ConversionPreset>
+    <ConversionPreset Name="To Pdf (Excel Fit Columns Landscape)" OutputType="Pdf" IsDefaultSettings="true">
+        <InputTypes>xls</InputTypes>
+        <InputTypes>xlsx</InputTypes>
+        <InputTypes>ods</InputTypes>
+        <InputPostConversionAction>None</InputPostConversionAction>
+        <Settings Key="ExcelPageOrientation" Value="Landscape" />
+        <Settings Key="ExcelFitColumnsToPage" Value="True" />
+        <OutputFileNameTemplate>(p)(f)</OutputFileNameTemplate>
+    </ConversionPreset>
     <CheckUpgradeAtStartup>true</CheckUpgradeAtStartup>
     <CopyFilesInClipboardAfterConversion>false</CopyFilesInClipboardAfterConversion>
+    <AppTheme>Light</AppTheme>
+    <OcrDefaultLanguages>ita+eng</OcrDefaultLanguages>
+    <PreferOfficeInteropWhenAvailable>true</PreferOfficeInteropWhenAvailable>
+    <PinnedQuickToolIds>
+        <ToolId>MergePdf</ToolId>
+        <ToolId>SplitPdf</ToolId>
+        <ToolId>CompressPdf</ToolId>
+        <ToolId>PdfToWord</ToolId>
+        <ToolId>PdfToPowerPoint</ToolId>
+        <ToolId>PdfToExcel</ToolId>
+        <ToolId>WordToPdf</ToolId>
+        <ToolId>PowerPointToPdf</ToolId>
+        <ToolId>ExcelToPdf</ToolId>
+        <ToolId>EditPdf</ToolId>
+        <ToolId>PdfToJpg</ToolId>
+        <ToolId>JpgToPdf</ToolId>
+        <ToolId>RotatePdf</ToolId>
+        <ToolId>HtmlToPdf</ToolId>
+        <ToolId>preset:To Mp4</ToolId>
+        <ToolId>preset:To Mp3</ToolId>
+        <ToolId>preset:To Png</ToolId>
+        <ToolId>preset:To Webp</ToolId>
+    </PinnedQuickToolIds>
 </Settings>

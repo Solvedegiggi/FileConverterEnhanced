@@ -1,0 +1,132 @@
+<UserControl x:Class="FileConverter.Views.Workspaces.PdfCompareWorkspaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:generic="clr-namespace:FileConverter.ValueConverters.Generic"
+             xmlns:workspaces="clr-namespace:FileConverter.Views.Workspaces">
+    <UserControl.Resources>
+        <generic:HexToBrushConverter x:Key="HexToBrush" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <workspaces:WorkspaceHeaderControl Grid.Row="0" />
+
+        <!-- Top Comparison Controls -->
+        <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="10"
+                Padding="12" Margin="0,0,0,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <WrapPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource HubSecondaryButton}" Margin="0,2,8,2" Padding="10,5"
+                            Command="{Binding BrowsePdfACommand}">
+                        <TextBlock Text="{Binding PdfNameA, StringFormat='A: {0}'}" MaxWidth="200" TextTrimming="CharacterEllipsis" />
+                    </Button>
+                    <Button Style="{StaticResource HubSecondaryButton}" Margin="0,2,12,2" Padding="10,5"
+                            Command="{Binding BrowsePdfBCommand}">
+                        <TextBlock Text="{Binding PdfNameB, StringFormat='B: {0}'}" MaxWidth="200" TextTrimming="CharacterEllipsis" />
+                    </Button>
+
+                    <Button Content="◀" Width="28" Height="28" Padding="0" Margin="2" Style="{StaticResource HubSecondaryButton}"
+                            Command="{Binding PrevPageCommand}" />
+                    <TextBlock Text="{Binding PageIndicatorText}" VerticalAlignment="Center" Margin="8,2" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <Button Content="▶" Width="28" Height="28" Padding="0" Margin="2,2,14,2" Style="{StaticResource HubSecondaryButton}"
+                            Command="{Binding NextPageCommand}" />
+
+                    <RadioButton GroupName="CompareMode" Content="Side-by-Side" Margin="4,2"
+                                 Foreground="{DynamicResource TextPrimaryBrush}" IsChecked="{Binding IsSideBySideMode, Mode=TwoWay}" />
+                    <RadioButton GroupName="CompareMode" Content="Visual Diff Overlay" Margin="4,2"
+                                 Foreground="{DynamicResource TextPrimaryBrush}" IsChecked="{Binding IsDiffOverlayMode, Mode=TwoWay}" />
+                    <RadioButton GroupName="CompareMode" Content="Text Diff" Margin="4,2"
+                                 Foreground="{DynamicResource TextPrimaryBrush}" IsChecked="{Binding IsTextDiffMode, Mode=TwoWay}" />
+
+                    <Slider Width="90" Minimum="0.5" Maximum="2.0" Value="{Binding Zoom}" VerticalAlignment="Center" Margin="10,2" />
+
+                    <Button Content="Export Report (.md)" Style="{StaticResource HubPrimaryButton}" Padding="12,6" Margin="6,2,0,2"
+                            Command="{Binding ExportReportCommand}" />
+                </WrapPanel>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="{Binding DiffSummaryText}" FontWeight="SemiBold" FontSize="12.5"
+                               Foreground="{DynamicResource MainBrush}" />
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" Margin="14,0,0,0"
+                               Foreground="{DynamicResource SuccessForegroundBrush}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Stage Views -->
+        <Grid Grid.Row="2" AllowDrop="True" DragOver="CompareArea_DragOver" Drop="CompareArea_Drop">
+            <!-- Side-by-Side Synchronized View -->
+            <Grid Visibility="{Binding IsSideBySideMode, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="{DynamicResource SubtlePanelBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="8">
+                    <ScrollViewer x:Name="LeftScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                                  ScrollChanged="SyncScrollViewer_ScrollChanged">
+                        <Image Source="{Binding CompareResult.LeftImage}" Stretch="None">
+                            <Image.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}" />
+                            </Image.LayoutTransform>
+                        </Image>
+                    </ScrollViewer>
+                </Border>
+
+                <Border Grid.Column="2" Background="{DynamicResource SubtlePanelBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="8">
+                    <ScrollViewer x:Name="RightScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                                  ScrollChanged="SyncScrollViewer_ScrollChanged">
+                        <Image Source="{Binding CompareResult.RightImage}" Stretch="None">
+                            <Image.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}" />
+                            </Image.LayoutTransform>
+                        </Image>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <!-- Visual Diff Overlay View -->
+            <Border Background="{DynamicResource SubtlePanelBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="8"
+                    Visibility="{Binding IsDiffOverlayMode, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Image Source="{Binding CompareResult.DiffOverlayImage}" Stretch="None" HorizontalAlignment="Center">
+                        <Image.LayoutTransform>
+                            <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}" />
+                        </Image.LayoutTransform>
+                    </Image>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Text Diff View -->
+            <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="12"
+                    Visibility="{Binding IsTextDiffMode, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                <ListBox ItemsSource="{Binding CompareResult.TextDiffLines}"
+                         Background="{DynamicResource InputBackgroundBrush}" BorderThickness="0" FontFamily="Consolas" FontSize="12.5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="2">
+                                <TextBlock Text="{Binding Prefix}" FontWeight="Bold"
+                                           Foreground="{Binding ColorHex, Converter={StaticResource HexToBrush}}" />
+                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
+                                           Foreground="{Binding ColorHex, Converter={StaticResource HexToBrush}}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

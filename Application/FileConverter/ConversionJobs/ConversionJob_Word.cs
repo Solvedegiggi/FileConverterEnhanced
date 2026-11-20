@@ -32,7 +32,7 @@ namespace FileConverter.ConversionJobs
 
         protected override int GetOutputFilesCount()
         {
-            if (this.ConversionPreset.OutputType == OutputType.Pdf)
+            if (this.ConversionPreset.OutputType == OutputType.Pdf || !this.ShouldUseMicrosoftOfficeInterop())
             {
                 return 1;
             }
@@ -86,38 +86,55 @@ namespace FileConverter.ConversionJobs
                 throw new System.Exception("The conversion preset must be valid.");
             }
 
-            this.UserState = Properties.Resources.ConversionStateReadDocument;
-
-            if (!this.TryLoadDocumentIfNecessary())
+            if (this.UseLibreOfficeFallback)
             {
-                this.ConversionFailed(Properties.Resources.ErrorUnableToUseMicrosoftOffice);
-                return;
+                this.UserState = Properties.Resources.ConversionStateConversion;
+                if (!Services.LibreOfficeHelper.ConvertToPdf(this.InputFilePath, this.intermediateFilePath, out string loError))
+                {
+                    this.ConversionFailed(loError);
+                    return;
+                }
             }
+            else if (this.UseNativeFallback)
+            {
+                this.UserState = Properties.Resources.ConversionStateConversion;
+                Services.NativeOfficeToPdfConverter.ConvertDocxToPdf(this.InputFilePath, this.intermediateFilePath);
+            }
+            else
+            {
+                this.UserState = Properties.Resources.ConversionStateReadDocument;
 
-            // Make this document the active document.
-            this.document.Activate();
+                if (!this.TryLoadDocumentIfNecessary())
+                {
+                    this.ConversionFailed(Properties.Resources.ErrorUnableToUseMicrosoftOffice);
+                    return;
+                }
 
-            this.UserState = Properties.Resources.ConversionStateConversion;
+                // Make this document the active document.
+                this.document.Activate();
 
-            Debug.Log("Convert word document to pdf.");
-            // this.document.ExportAsFixedFormat(this.intermediateFilePath, Word.WdExportFormat.wdExportFormatPDF);
-            this.document.ExportAsFixedFormat(this.intermediateFilePath, 
-                Word.Enums.WdExportFormat.wdExportFormatPDF, 
-                false, 
-                Word.Enums.WdExportOptimizeFor.wdExportOptimizeForPrint, 
-                Word.Enums.WdExportRange.wdExportAllDocument, 
-                1, 1, 
-                Word.Enums.WdExportItem.wdExportDocumentContent, 
-                true, 
-                true, 
-                Word.Enums.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, 
-                true);
+                this.UserState = Properties.Resources.ConversionStateConversion;
 
-            Debug.Log($"Close word document '{this.InputFilePath}'.");
-            this.document.Close(Word.Enums.WdSaveOptions.wdDoNotSaveChanges);
-            this.document = null;
+                Debug.Log("Convert word document to pdf.");
+                // this.document.ExportAsFixedFormat(this.intermediateFilePath, Word.WdExportFormat.wdExportFormatPDF);
+                this.document.ExportAsFixedFormat(this.intermediateFilePath, 
+                    Word.Enums.WdExportFormat.wdExportFormatPDF, 
+                    false, 
+                    Word.Enums.WdExportOptimizeFor.wdExportOptimizeForPrint, 
+                    Word.Enums.WdExportRange.wdExportAllDocument, 
+                    1, 1, 
+                    Word.Enums.WdExportItem.wdExportDocumentContent, 
+                    true, 
+                    true, 
+                    Word.Enums.WdExportCreateBookmarks.wdExportCreateHeadingBookmarks, 
+                    true);
 
-            this.ReleaseOfficeApplicationInstanceIfNeeded();
+                Debug.Log($"Close word document '{this.InputFilePath}'.");
+                this.document.Close(Word.Enums.WdSaveOptions.wdDoNotSaveChanges);
+                this.document = null;
+
+                this.ReleaseOfficeApplicationInstanceIfNeeded();
+            }
             
             if (this.pdf2ImageConversionJob != null)
             {

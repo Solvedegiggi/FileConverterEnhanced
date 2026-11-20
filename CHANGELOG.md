@@ -1,5 +1,13 @@
 # Change Log
 
+## Version 2.3
+
+- New: Desktop Hub window (`Home Rapida` configurable grid, `Convertitore Universale`, `Tutti gli Strumenti`, Queue, Light/Dark theme).
+- New: Complete 20-tool PDF & Document Suite (Merge, Split, Compress, Rotate, Page Numbers, Organize, Crop, Edit with in-place text editing/redaction, Compare PDF visual+text diff, PDF <-> Word/PowerPoint/Excel, PDF -> JPG + image extraction, Images -> PDF, HTML/URL -> PDF, Offline/On-Demand OCR PDF with Tesseract, PDF -> Markdown).
+- New: Excel -> PDF page orientation (Portrait/Landscape) and Fit All Columns to Page Width options; offline LibreOffice & OpenXML fallback when MS Office is not installed.
+- New: Windows Explorer contextual `PDF & Document Tools` submenu alongside 1-click presets.
+- Tech: Fork update endpoint configured for `Solvedegiggi/FileConverterEnhanced` GitHub Releases.
+
 ## Version 2.2
 
 - New: AMD AMF hardware acceleration option for MP4/MKV H.264 conversions (thanks to bharatvansh).

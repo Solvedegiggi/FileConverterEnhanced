@@ -21,13 +21,19 @@ namespace FileConverter
     {
         public static readonly string[] CompatibleInputExtensions = {
             "3gp","3gpp","aac","aiff","ape","arw","avi","avif","bik","bmp","cda","cr2","dds","dng","doc","docx",
-            "exr","flac","flv","gif","heic","ico","jfif","jpg","jpeg","m4a","m4b","m4v","mkv","mov","mp3","mp4",
+            "exr","flac","flv","gif","heic","htm","html","ico","jfif","jpg","jpeg","m4a","m4b","m4v","mkv","mov","mp3","mp4",
             "mpg","mpeg","nef","odp","ods","odt","oga","ogg","ogv","opus","pdf","png","ppt","pptx","psd",
             "raf", "rm","svg","tga","tif","tiff", "ts", "vob","wav","webm","webp","wma","wmv","xls","xlsx"
         };
 
         public static string GetExtensionCategory(string extension)
         {
+            if (string.IsNullOrEmpty(extension))
+            {
+                return InputCategoryNames.Misc;
+            }
+
+            extension = extension.TrimStart('.').ToLowerInvariant();
             switch (extension)
             {
                 case "aac":
@@ -101,7 +107,12 @@ namespace FileConverter
                 case "odt":
                 case "xls":
                 case "xlsx":
+                case "md":
                     return InputCategoryNames.Document;
+
+                case "html":
+                case "htm":
+                    return InputCategoryNames.Web;
             }
 
             return InputCategoryNames.Misc;
@@ -224,11 +235,84 @@ namespace FileConverter
                     return category == InputCategoryNames.Image || category == InputCategoryNames.Video || category == InputCategoryNames.AnimatedImage;
 
                 case OutputType.Pdf:
-                    return category == InputCategoryNames.Image || category == InputCategoryNames.Document;
+                    return category == InputCategoryNames.Image || category == InputCategoryNames.Document || category == InputCategoryNames.Web;
+
+                case OutputType.Docx:
+                case OutputType.Pptx:
+                case OutputType.Xlsx:
+                case OutputType.Md:
+                    return category == InputCategoryNames.Document;
 
                 default:
                     return false;
             }
+        }
+
+        public static bool IsOutputTypeCompatibleWithExtension(OutputType outputType, string inputExtension)
+        {
+            if (string.IsNullOrEmpty(inputExtension))
+            {
+                return false;
+            }
+
+            string ext = inputExtension.TrimStart('.').ToLowerInvariant();
+            if (outputType == OutputType.Docx ||
+                outputType == OutputType.Pptx ||
+                outputType == OutputType.Xlsx ||
+                outputType == OutputType.Md)
+            {
+                return ext == "pdf";
+            }
+
+            if (outputType == OutputType.Pdf)
+            {
+                string category = GetExtensionCategory(ext);
+                return category == InputCategoryNames.Image ||
+                       category == InputCategoryNames.Document ||
+                       category == InputCategoryNames.Web;
+            }
+
+            string inputCategory = GetExtensionCategory(ext);
+            return IsOutputTypeCompatibleWithCategory(outputType, inputCategory);
+        }
+
+        public static string GetOutputExtension(OutputType outputType)
+        {
+            return outputType.ToString().ToLowerInvariant();
+        }
+
+        public static string FindLibreOfficeExecutable()
+        {
+            string[] candidates = new[]
+            {
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "LibreOffice", "program", "soffice.exe"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "LibreOffice", "program", "soffice.exe"),
+            };
+
+            for (int index = 0; index < candidates.Length; index++)
+            {
+                if (File.Exists(candidates[index]))
+                {
+                    return candidates[index];
+                }
+            }
+
+            try
+            {
+                using (RegistryKey key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\soffice.exe", false))
+                {
+                    string path = key?.GetValue(string.Empty) as string;
+                    if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                    {
+                        return path;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return null;
         }
 
         public static Thread InstantiateThread(string name, ThreadStart threadStart)
@@ -297,7 +381,7 @@ namespace FileConverter
             RegistryKey winwordKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(registryKeyPattern, false);
             if (winwordKey != null)
             {
-                string winwordPath = winwordKey.GetValue(string.Empty).ToString();
+                string winwordPath = winwordKey.GetValue(string.Empty)?.ToString();
                 if (!string.IsNullOrEmpty(winwordPath))
                 {
                     return true;
@@ -308,7 +392,7 @@ namespace FileConverter
             winwordKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(registryKeyPattern, false);
             if (winwordKey != null)
             {
-                string winwordPath = winwordKey.GetValue(string.Empty).ToString();
+                string winwordPath = winwordKey.GetValue(string.Empty)?.ToString();
                 if (!string.IsNullOrEmpty(winwordPath))
                 {
                     return true;
@@ -348,6 +432,7 @@ namespace FileConverter
             public const string Image = "Image";
             public const string AnimatedImage = "Animated Image";
             public const string Document = "Document";
+            public const string Web = "Web";
 
             public const string Misc = "Misc";
         }

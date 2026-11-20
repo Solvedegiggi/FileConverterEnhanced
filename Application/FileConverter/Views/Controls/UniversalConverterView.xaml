@@ -1,0 +1,171 @@
+<UserControl x:Class="FileConverter.Views.Controls.UniversalConverterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:project="clr-namespace:FileConverter.Properties">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Views/Resources/ConversionPresetTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="{x:Static project:Resources.HubNavConverter}"
+                   FontSize="22" FontWeight="Bold" Margin="0,0,0,16"
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.1*" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="1.2*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT: Input Files Dropzone & List -->
+            <Border Grid.Column="0" Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" CornerRadius="10" Padding="20"
+                            Background="{DynamicResource DropZoneBackgroundBrush}"
+                            BorderBrush="{DynamicResource DropZoneBorderBrush}" BorderThickness="2"
+                            AllowDrop="True" DragOver="DropZone_DragOver" Drop="DropZone_Drop">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="{x:Static project:Resources.UniversalDropHint}"
+                                       FontSize="13.5" FontWeight="SemiBold" TextAlignment="Center"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,10" />
+                            <Button Content="{x:Static project:Resources.UniversalBrowseFiles}"
+                                    Style="{StaticResource HubPrimaryButton}"
+                                    HorizontalAlignment="Center"
+                                    Command="{Binding BrowseFilesCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <DockPanel Grid.Row="1" Margin="0,14,0,8">
+                        <TextBlock Text="{x:Static project:Resources.UniversalInputFiles}"
+                                   FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <Button Content="{x:Static project:Resources.UniversalClearList}"
+                                DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                Style="{StaticResource HubSecondaryButton}" Padding="8,4" FontSize="12"
+                                Command="{Binding ClearFilesCommand}" />
+                    </DockPanel>
+
+                    <ListBox Grid.Row="2" ItemsSource="{Binding InputFiles}"
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             BorderBrush="{DynamicResource InputBorderBrush}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="4">
+                                    <Button Content="✕" Width="24" Height="24" DockPanel.Dock="Right"
+                                            Style="{StaticResource HubSecondaryButton}" Padding="0"
+                                            Command="{Binding DataContext.RemoveFileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}" />
+                                    <StackPanel Margin="0,0,8,0">
+                                        <TextBlock Text="{Binding FileName}" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}" />
+                                        <TextBlock Text="{Binding SizeText}" FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="3" Margin="0,12,0,0">
+                        <TextBlock Text="{x:Static project:Resources.UniversalUrlLabel}"
+                                   FontSize="12" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <TextBox Style="{StaticResource ModernInputTextBox}"
+                                 Text="{Binding WebUrl, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- RIGHT: Output Format, Inline Settings & Destination -->
+            <Border Grid.Column="2" Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="{x:Static project:Resources.UniversalOutputFormat}"
+                               FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+
+                    <StackPanel Grid.Row="1" Margin="0,0,0,12">
+                        <ComboBox Height="34" ItemsSource="{Binding CompatibleOutputs}"
+                                  SelectedItem="{Binding SelectedOutput, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding GroupName, StringFormat='  [{0}]'}" Opacity="0.7" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Text="{Binding StatusMessage}" Margin="0,6,0,0" FontSize="12"
+                                   Foreground="{DynamicResource ErrorForegroundBrush}"
+                                   TextWrapping="Wrap" />
+
+                        <CheckBox Margin="0,8,0,0"
+                                  Content="{x:Static project:Resources.ToolMergePdfTitle}"
+                                  IsChecked="{Binding MergeIntoSinglePdf, Mode=TwoWay}"
+                                  Visibility="{Binding ShowMergeOption, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}" />
+                    </StackPanel>
+
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                        <ContentControl Content="{Binding WorkingPreset}"
+                                        Style="{StaticResource DirectPresetSettingsSelectorStyle}" />
+                    </ScrollViewer>
+
+                    <StackPanel Grid.Row="3" Margin="0,12,0,14">
+                        <TextBlock Text="{x:Static project:Resources.UniversalOutputDestination}"
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                            <RadioButton Content="{x:Static project:Resources.UniversalSameFolder}"
+                                         IsChecked="{Binding UseCustomOutputFolder, Converter={StaticResource BoolInverter}}"
+                                         Margin="0,0,16,0" />
+                            <RadioButton Content="{x:Static project:Resources.UniversalCustomFolder}"
+                                         IsChecked="{Binding UseCustomOutputFolder}" />
+                        </StackPanel>
+                        <DockPanel Visibility="{Binding UseCustomOutputFolder, Converter={StaticResource BoolToVisibility}, ConverterParameter=Collapsed}">
+                            <Button Content="{x:Static project:Resources.CommonBrowse}" DockPanel.Dock="Right"
+                                    Style="{StaticResource HubSecondaryButton}" Margin="8,0,0,0"
+                                    Command="{Binding BrowseOutputFolderCommand}" />
+                            <TextBox Style="{StaticResource ModernInputTextBox}"
+                                     Text="{Binding CustomOutputFolder, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                    </StackPanel>
+
+                    <Button Grid.Row="4" Height="42"
+                            Content="{x:Static project:Resources.UniversalStartConversion}"
+                            Style="{StaticResource HubPrimaryButton}"
+                            Command="{Binding ConvertCommand}" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,68 @@
+<UserControl x:Class="FileConverter.Views.Workspaces.WorkspaceFileListControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:project="clr-namespace:FileConverter.Properties">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" CornerRadius="10" Padding="18"
+                Background="{DynamicResource DropZoneBackgroundBrush}"
+                BorderBrush="{DynamicResource DropZoneBorderBrush}" BorderThickness="2"
+                AllowDrop="True" DragOver="DropZone_DragOver" Drop="DropZone_Drop">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="{x:Static project:Resources.UniversalDropHint}"
+                           FontSize="13" FontWeight="SemiBold" TextAlignment="Center"
+                           Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,10" />
+                <Button Content="{x:Static project:Resources.UniversalBrowseFiles}"
+                        Style="{StaticResource HubPrimaryButton}" HorizontalAlignment="Center"
+                        Command="{Binding BrowseFilesCommand}" />
+            </StackPanel>
+        </Border>
+
+        <DockPanel Grid.Row="1" Margin="0,12,0,8">
+            <TextBlock Text="{x:Static project:Resources.UniversalInputFiles}"
+                       FontSize="13.5" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+            <Button Content="{x:Static project:Resources.UniversalClearList}"
+                    DockPanel.Dock="Right" HorizontalAlignment="Right"
+                    Style="{StaticResource HubSecondaryButton}" Padding="8,4" FontSize="12"
+                    Command="{Binding ClearFilesCommand}" />
+        </DockPanel>
+
+        <ListBox Grid.Row="2" ItemsSource="{Binding InputFiles}"
+                 Background="{DynamicResource InputBackgroundBrush}"
+                 BorderBrush="{DynamicResource InputBorderBrush}"
+                 MinHeight="160">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel Margin="3">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                            <Button Content="↑" Width="26" Height="24" Margin="2,0"
+                                    Style="{StaticResource HubSecondaryButton}" Padding="0"
+                                    ToolTip="{x:Static project:Resources.CommonMoveUp}"
+                                    Command="{Binding DataContext.MoveFileUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
+                            <Button Content="↓" Width="26" Height="24" Margin="2,0"
+                                    Style="{StaticResource HubSecondaryButton}" Padding="0"
+                                    ToolTip="{x:Static project:Resources.CommonMoveDown}"
+                                    Command="{Binding DataContext.MoveFileDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
+                            <Button Content="✕" Width="26" Height="24" Margin="2,0"
+                                    Style="{StaticResource HubSecondaryButton}" Padding="0"
+                                    ToolTip="{x:Static project:Resources.CommonRemove}"
+                                    Command="{Binding DataContext.RemoveFileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="0,0,8,0"
+                                   TextTrimming="CharacterEllipsis"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" />
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
